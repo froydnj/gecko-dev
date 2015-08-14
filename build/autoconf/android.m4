@@ -20,6 +20,11 @@ MOZ_ARG_WITH_STRING(android-gnu-compiler-version,
                           gnu compiler version to use],
     android_gnu_compiler_version=$withval)
 
+MOZ_ARG_WITH_STRING(android-llvm-compiler-version,
+[  --with-android-llvm-compiler-version=VER
+                          llvm compiler version to use (optional)],
+    android_llvm_compiler_version=$withval)
+
 MOZ_ARG_WITH_STRING(android-cxx-stl,
 [  --with-android-cxx-stl=VALUE
                           use the specified C++ STL (stlport, libstdc++, libc++)],
@@ -107,6 +112,31 @@ case "$target" in
             AC_MSG_RESULT([$android_toolchain])
         fi
         NSPR_CONFIGURE_ARGS="$NSPR_CONFIGURE_ARGS --with-android-toolchain=$android_toolchain"
+
+        # Only use LLVM if the user specifically requests it.
+        if test -n "$android_llvm_compiler_version"; then
+            AC_MSG_CHECKING([for android llvm toolchain directory])
+            version="$android_llvm_compiler_version"
+            case "$host_cpu" in
+            i*86)
+                android_llvm_toolchain="$android_ndk"/toolchains/llvm-"$version"/prebuilt/"$kernel_name"-x86
+                ;;
+            x86_64)
+                android_llvm_toolchain="$android_ndk"/toolchains/llvm-"$version"/prebuilt/"$kernel_name"-x86_64
+                echo testing llvm toolchain dir $android_llvm_toolchain
+                if ! test -d "$android_llvm_toolchain" ; then
+                    android_llvm_toolchain="$android_ndk"/toolchains/llvm-"$version"/prebuilt/"$kernel_name"-x86
+                fi
+                ;;
+            *)
+                AC_MSG_ERROR([No known llvm toolchain for your host cpu])
+                ;;
+            esac
+            echo llvm toolchain dir $android_llvm_toolchain
+            if ! test -d "$android_llvm_toolchain"; then
+                AC_MSG_ERROR([not found.  Your --with-android-llvm-compiler-version may be wrong.])
+            fi
+        fi
     fi
 
     NSPR_CONFIGURE_ARGS="$NSPR_CONFIGURE_ARGS --with-android-version=$android_version"
@@ -137,13 +167,25 @@ case "$target" in
     TOOLCHAIN_PREFIX="$android_toolchain/bin/$android_tool_prefix-"
     AS="$android_toolchain"/bin/"$android_tool_prefix"-as
     if test -z "$CC"; then
-        CC="$android_toolchain"/bin/"$android_tool_prefix"-gcc
+        if test -n "$android_llvm_toolchain"; then
+            CC="$android_llvm_toolchain/bin/clang --target=$target -gcc-toolchain $android_toolchain"
+        else
+            CC="$android_toolchain"/bin/"$android_tool_prefix"-gcc
+        fi
     fi
     if test -z "$CXX"; then
-        CXX="$android_toolchain"/bin/"$android_tool_prefix"-g++
+        if test -n "$android_llvm_toolchain"; then
+            CXX="$android_llvm_toolchain/bin/clang++ --target=$target -gcc-toolchain $android_toolchain"
+        else
+            CXX="$android_toolchain"/bin/"$android_tool_prefix"-g++
+        fi
     fi
     if test -z "$CPP"; then
-        CPP="$android_toolchain"/bin/"$android_tool_prefix"-cpp
+        if test -n "$android_llvm_toolchain"; then
+            CPP="$android_llvm_toolchain/bin/clang --target=$target -gcc-toolchain $android_toolchain -E"
+        else
+            CPP="$android_toolchain"/bin/"$android_tool_prefix"-cpp
+        fi
     fi
     LD="$android_toolchain"/bin/"$android_tool_prefix"-ld
     AR="$android_toolchain"/bin/"$android_tool_prefix"-ar
@@ -151,16 +193,34 @@ case "$target" in
     STRIP="$android_toolchain"/bin/"$android_tool_prefix"-strip
     OBJCOPY="$android_toolchain"/bin/"$android_tool_prefix"-objcopy
 
-    CPPFLAGS="-idirafter $android_platform/usr/include $CPPFLAGS"
-    CFLAGS="-mandroid -fno-short-enums -fno-exceptions $CFLAGS"
-    CXXFLAGS="-mandroid -fno-short-enums -fno-exceptions -Wno-psabi $CXXFLAGS"
+    # -idirafter does not work correctly with llvm; the default #include search
+    # paths actually include host paths outside of the NDK (!), so using -idirafter
+    # insert the android platform's /usr/include after the host's /usr/include,
+    # which obviously doesn't work that well.  Using -I appears to put things in
+    # the correct place.
+    if test -z "$android_llvm_toolchain"; then
+        CPPFLAGS="-idirafter $android_platform/usr/include $CPPFLAGS"
+    else
+        CPPFLAGS="-I $android_platform/usr/include $CPPFLAGS"
+    fi
+    CFLAGS="-fno-short-enums -fno-exceptions $CFLAGS"
+    if test -z "$android_llvm_toolchain"; then
+        CFLAGS="-mandroid $CFLAGS"
+    fi
+    CXXFLAGS="-fno-short-enums -fno-exceptions -Wno-psabi $CXXFLAGS"
+    if test -z "$android_llvm_toolchain"; then
+        CXXFLAGS="-mandroid $CXXFLAGS"
+    fi
     ASFLAGS="-idirafter $android_platform/usr/include -DANDROID $ASFLAGS"
 
     dnl Add -llog by default, since we use it all over the place.
     dnl Add --allow-shlib-undefined, because libGLESv2 links to an
     dnl undefined symbol (present on the hardware, just not in the
     dnl NDK.)
-    LDFLAGS="-mandroid -L$android_platform/usr/lib -Wl,-rpath-link=$android_platform/usr/lib --sysroot=$android_platform -llog -Wl,--allow-shlib-undefined $LDFLAGS"
+    LDFLAGS="-L$android_platform/usr/lib -Wl,-rpath-link=$android_platform/usr/lib --sysroot=$android_platform -llog -Wl,--allow-shlib-undefined $LDFLAGS"
+    if test -z "$android_llvm_toolchain"; then
+        LDFLAGS="-mandroid $LDFLAGS"
+    fi
     dnl prevent cross compile section from using these flags as host flags
     if test -z "$HOST_CPPFLAGS" ; then
         HOST_CPPFLAGS=" "
