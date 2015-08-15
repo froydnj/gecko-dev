@@ -201,7 +201,7 @@ case "$target" in
     if test -z "$android_llvm_toolchain"; then
         CPPFLAGS="-idirafter $android_platform/usr/include $CPPFLAGS"
     else
-        CPPFLAGS="-I $android_platform/usr/include $CPPFLAGS"
+        CPPFLAGS="-isystem $android_platform/usr/include $CPPFLAGS"
     fi
     CFLAGS="-fno-short-enums -fno-exceptions $CFLAGS"
     if test -z "$android_llvm_toolchain"; then
@@ -319,7 +319,7 @@ if test "$OS_TARGET" = "Android" -a -z "$gonkdir"; then
         mozstlport)
             # We don't need to set STLPORT_LIBS, because the build system will
             # take care of linking in our home-built stlport where it is needed.
-            STLPORT_CPPFLAGS="-isystem $_topsrcdir/build/stlport/stlport -isystem $_topsrcdir/build/stlport/overrides -isystem $android_ndk/sources/cxx-stl/system/include"
+            STLPORT_CPPFLAGS="-I $_topsrcdir/build/stlport/stlport -I $_topsrcdir/build/stlport/overrides -I $android_ndk/sources/cxx-stl/system/include"
             ;;
         *)
             AC_MSG_ERROR([Bad value for --enable-android-cxx-stl])
