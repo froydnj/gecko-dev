@@ -207,9 +207,9 @@ case "$target" in
     if test -z "$android_llvm_toolchain"; then
         CFLAGS="-mandroid $CFLAGS"
     fi
-    CXXFLAGS="-fno-short-enums -fno-exceptions -Wno-psabi $CXXFLAGS"
+    CXXFLAGS="-fno-short-enums -fno-exceptions $CXXFLAGS"
     if test -z "$android_llvm_toolchain"; then
-        CXXFLAGS="-mandroid $CXXFLAGS"
+        CXXFLAGS="-mandroid -Wno-psabi $CXXFLAGS"
     fi
     ASFLAGS="-idirafter $android_platform/usr/include -DANDROID $ASFLAGS"
 
