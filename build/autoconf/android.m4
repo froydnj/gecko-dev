@@ -168,21 +168,21 @@ case "$target" in
     AS="$android_toolchain"/bin/"$android_tool_prefix"-as
     if test -z "$CC"; then
         if test -n "$android_llvm_toolchain"; then
-            CC="$android_llvm_toolchain/bin/clang --target=$target -gcc-toolchain $android_toolchain"
+            CC="$android_llvm_toolchain/bin/clang --target=armv5te-none-linux-androideabi -gcc-toolchain $android_toolchain"
         else
             CC="$android_toolchain"/bin/"$android_tool_prefix"-gcc
         fi
     fi
     if test -z "$CXX"; then
         if test -n "$android_llvm_toolchain"; then
-            CXX="$android_llvm_toolchain/bin/clang++ --target=$target -gcc-toolchain $android_toolchain"
+            CXX="$android_llvm_toolchain/bin/clang++ --target=armv5te-none-linux-androideabi -gcc-toolchain $android_toolchain"
         else
             CXX="$android_toolchain"/bin/"$android_tool_prefix"-g++
         fi
     fi
     if test -z "$CPP"; then
         if test -n "$android_llvm_toolchain"; then
-            CPP="$android_llvm_toolchain/bin/clang --target=$target -gcc-toolchain $android_toolchain -E"
+            CPP="$android_llvm_toolchain/bin/clang --target=armv5te-none-linux-androideabi -gcc-toolchain $android_toolchain -E"
         else
             CPP="$android_toolchain"/bin/"$android_tool_prefix"-cpp
         fi
