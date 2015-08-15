@@ -572,6 +572,13 @@ if not CONFIG['INTEL_ARCHITECTURE'] and CONFIG['CPU_ARCH'] == 'arm' and CONFIG['
             'skia/src/opts/memset16_neon.S',
             'skia/src/opts/memset32_neon.S',
         ]
+    if CONFIG['CLANG_CXX']:
+        ASFLAGS += [
+            '-fno-integrated-as',
+        ]
+        CXXFLAGS += [
+            '-fno-integrated-as',
+        ]
 
 if CONFIG['INTEL_ARCHITECTURE'] and CONFIG['GNU_CC'] and CONFIG['OS_ARCH'] != 'WINNT':
     if CONFIG['CPU_ARCH'] == 'x86_64':
