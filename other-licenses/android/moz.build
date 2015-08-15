@@ -31,3 +31,8 @@ SOURCES += [
 ALLOW_COMPILER_WARNINGS = True
 
 FINAL_LIBRARY = 'mozglue'
+
+if CONFIG['CLANG_CXX']:
+    CFLAGS += [
+        '-Wno-self-assign',
+    ]
