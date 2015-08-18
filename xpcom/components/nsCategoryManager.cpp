@@ -113,14 +113,9 @@ BaseStringEnumerator::GetNext(nsISupports** aResult)
     return NS_ERROR_FAILURE;
   }
 
-  nsSupportsDependentCString* str =
+  RefPtr<nsSupportsDependentCString> str =
     new nsSupportsDependentCString(mArray[mSimpleCurItem++]);
-  if (!str) {
-    return NS_ERROR_OUT_OF_MEMORY;
-  }
-
-  *aResult = str;
-  NS_ADDREF(*aResult);
+  str.forget(aResult);
   return NS_OK;
 }
 
