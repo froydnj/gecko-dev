@@ -2019,11 +2019,8 @@ nsPipeConstructor(nsISupports* aOuter, REFNSIID aIID, void** aResult)
   if (aOuter) {
     return NS_ERROR_NO_AGGREGATION;
   }
-  nsPipe* pipe = new nsPipe();
-  NS_ADDREF(pipe);
-  nsresult rv = pipe->QueryInterface(aIID, aResult);
-  NS_RELEASE(pipe);
-  return rv;
+  RefPtr<nsPipe> pipe = new nsPipe();
+  return pipe->QueryInterface(aIID, aResult);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
