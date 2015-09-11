@@ -103,7 +103,9 @@ public:
 
   bool DataSize(int64_t* aSize);
   void Key(nsACString& aKey) { aKey = mKey; }
-  bool IsDoomed();
+  // See the comment on the definition of IsDoomed to understand this
+  // blacklisting.
+  bool IsDoomed() MOZ_TSAN_BLACKLIST;
   bool IsPinned() const { return mPinned; }
   bool IsWriteInProgress();
 

@@ -1780,13 +1780,50 @@ CacheFile::DataSize(int64_t* aSize)
   return true;
 }
 
+// TSan would report a race here, because mHandle is written to on the
+// CacheIOThread in OnFileOpened, and read out here (typically on the
+// main thread).  But the write access is locked, and the memory barrier
+// required by the unlocking will make the store visible to all threads,
+// so there's no race here.  (TSan is not smart enough to track the
+// effects of individual memory barriers or functions known to provide
+// memory barriers, and this particular memory barrier is likely hidden
+// away in a runtime library where TSan can't find it anyway.)
+//
+// The race here is problematic to fix, because mHandle is a smart
+// pointer, and so when the race is reported, the race is attributed to
+// the methods of nsRefPtr being called on our behalf (such as operator!
+// or operator->).  Blacklisting this function alone has no effect,
+// since TSan still instruments the nsRefPtr methods, which is where the
+// race "occurs".
+//
+// This race is one of the most frequent races seen during test runs, so
+// doing something about it is highly desirable.
+//
+// We therefore adopt a two-pronged strategy:
+//
+// - We manipulate the pointer stored inside the smart pointer directly,
+//   without going through any nsRefPtr methods.  This tactic ensures
+//   that the only memory accesses TSan sees are "bare" memory accesses,
+//   unmediated by any silent operators.
+//
+// - We can then blacklist the function, and TSan will ignore the bare
+//   memory accesses we have so carefully constructed in part 1.
 bool
 CacheFile::IsDoomed()
 {
+#if MOZ_TSAN
+  CacheFileHandle* handle =
+    *reinterpret_cast<CacheFileHandle**>(&mHandle);
+  if (!handle)
+    return false;
+
+  return handle->IsDoomed();
+#else
   if (!mHandle)
     return false;
 
   return mHandle->IsDoomed();
+#endif
 }
 
 bool
