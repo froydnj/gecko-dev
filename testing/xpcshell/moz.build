@@ -13,3 +13,7 @@ PYTHON_UNIT_TESTS += [
 TESTING_JS_MODULES += [
     'dbg-actors.js',
 ]
+
+TEST_HARNESS_FILES.xpcshell += [
+    '/build/sanitizers/lsan_suppressions.txt',
+]
