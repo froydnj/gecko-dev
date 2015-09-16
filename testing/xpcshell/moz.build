@@ -17,3 +17,7 @@ TESTING_JS_MODULES += [
 with Files("**"):
     BUG_COMPONENT = ("Testing", "XPCShell Harness")
     SCHEDULES.exclusive = ['xpcshell', 'xpcshell-coverage']
+
+TEST_HARNESS_FILES.xpcshell += [
+    '/build/sanitizers/lsan_suppressions.txt',
+]
