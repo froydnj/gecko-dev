@@ -980,6 +980,21 @@ class XPCShellTests(object):
 
         usingASan = "asan" in self.mozInfo and self.mozInfo["asan"]
         usingTSan = "tsan" in self.mozInfo and self.mozInfo["tsan"]
+        if usingASan:
+            lsanOptions = ['exitcode=0', 'max_leaks=1']
+            suppressionFileCandidates = [os.path.join(d, 'lsan_suppressions.txt')
+                                         for d in self.testdirs]
+            self.log.info("rxpct.py | LSan possibilities: %s" % suppressionFileCandidates)
+            suppressionFiles = [f for f in suppressionFileCandidates
+                                if os.path.exists(f)]
+            if len(suppressionFiles) > 1:
+                self.log.error("TEST-UNEXPECTED-FAIL | runxpcshelltests.py | Multiple LSan suppression files: %s" % suppressionFiles)
+            if suppressionFiles:
+                self.log.info("runxpcshelltests.py | LSan using suppression file %s" % suppressionFiles[0])
+                lsanOptions.append("suppressions=%s" % suppressionFiles[0])
+            self.env['LSAN_OPTIONS'] = ':'.join(lsanOptions)
+            # Run shutdown GCs and CCs to avoid spurious leaks.
+            self.env['MOZ_CC_RUN_DURING_SHUTDOWN'] = '1'
         if usingASan or usingTSan:
             # symbolizer support
             llvmsym = os.path.join(
