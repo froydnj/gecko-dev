@@ -8,6 +8,9 @@
 #include "mozilla/CheckedInt.h"
 #include "VideoUtils.h"
 
+#include "mozilla/Endian.h"
+#include "mozilla/TypeTraits.h"
+
 #include <opus/opus.h>
 
 #undef LOG
@@ -48,8 +51,17 @@ template<typename T>
 static void
 SerializeToBuffer(T aValue, nsTArray<uint8_t>* aOutput)
 {
-  for (uint32_t i = 0; i < sizeof(T); i++) {
-    aOutput->AppendElement((uint8_t)(0x000000ff & (aValue >> (i * 8))));
+  static_assert(IsIntegral<T>::value, "must serialize an integer type");
+  uint8_t *valbuf = aOutput->AppendElements(sizeof(T));
+  switch (sizeof(T)) {
+  case 2:
+    LittleEndian::writeUint16(valbuf, aValue);
+    break;
+  case 4:
+    LittleEndian::writeUint32(valbuf, aValue);
+    break;
+  default:
+    MOZ_CRASH();
   }
 }
 
