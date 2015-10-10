@@ -194,11 +194,7 @@ HaveExistingCacheFor(void* aPtr)
 {
   MOZ_ASSERT(NS_IsMainThread());
   if (gCacheData) {
-    for (size_t i = 0, count = gCacheData->Length(); i < count; ++i) {
-      if ((*gCacheData)[i]->cacheLocation == aPtr) {
-        return true;
-      }
-    }
+    return gCacheData->Contains(aPtr);
   }
   return false;
 }
