@@ -318,6 +318,75 @@ class CargoProvider(MachCommandBase):
         return 0
 
 @CommandProvider
+class DependenciesProvider(MachCommandBase):
+    @Command('dependencies', category='post-build',
+        description='Analyze build dependencies')
+    def analyze_dependencies(self):
+        pass
+
+    @SubCommand('dependencies', 'counts',
+        description='Print counts of how often dependencies are used.')
+    @CommandArgument('--show-all', action='store_true',
+        help='Show paths outside the source and object directories.')
+    @CommandArgument('--dont-resolve-paths', action='store_true',
+        help='Do not attempt to resolve paths to their original file. '
+            '(Show raw paths from build dependencies)')
+    @CommandArgument('--min', type=int,
+        help='Filter items without this many dependent targets.')
+    def dependency_counts(self, min=None, **kwargs):
+        deps = self._get_deps(**kwargs).dependencies
+
+        deps = {self._normalize_path(k): v for k, v in deps.iteritems()}
+
+        for d in sorted(deps, key=lambda k: len(deps[k]), reverse=True):
+            if isinstance(min, int) and len(deps[d]) < min:
+                continue
+
+            print('%d\t%s' % (len(deps[d]), d))
+
+    @SubCommand('dependencies', 'targets',
+        description='Print targets having a dependency.')
+    @CommandArgument('--source', action='store_true',
+        help='Try to resolve the source file instead of the actual target')
+    @CommandArgument('path',
+        help='Find targets that depend on a certain file')
+    def targets(self, path, source=False):
+        path = mozpath.abspath(path)
+        if not os.path.exists(path):
+            print('specified path does not exist: %s' % path)
+            return 1
+
+        deps = self._get_deps(show_all=True, dont_resolve_paths=False)
+
+        targets = deps.get_targets(path, resolve_source=source)
+        for t in sorted(self._normalize_path(t) for t in targets):
+            print(t)
+
+    def _get_deps(self, **kwargs):
+        from mozbuild.analyze import Dependencies, find_deps_files
+
+        deps = Dependencies(self.topsrcdir, self.topobjdir)
+        for objdir, path in find_deps_files(self.topobjdir):
+            with open(path, 'rb') as fh:
+                deps.load_deps_file(objdir, fh)
+
+        if not kwargs.get('show_all'):
+            deps = deps.prune_system_paths()
+
+        if not kwargs.get('dont_resolve_paths'):
+            deps = deps.resolve_srcdir_paths()
+
+        return deps
+
+    def _normalize_path(self, path):
+        if mozpath.basedir(path, [self.topobjdir]):
+            return mozpath.join('<objdir>', mozpath.relpath(path, self.topobjdir))
+        elif mozpath.basedir(path, [self.topsrcdir]):
+            return mozpath.relpath(path, self.topsrcdir)
+
+        return path
+
+@CommandProvider
 class Doctor(MachCommandBase):
     """Provide commands for diagnosing common build environment problems"""
     @Command('doctor', category='devenv',
