@@ -351,10 +351,22 @@ class DependenciesProvider(MachCommandBase):
     @CommandArgument('path',
         help='Find targets that depend on a certain file')
     def targets(self, path, source=False):
-        path = mozpath.abspath(path)
+        if not os.path.isabs(path):
+            # Accommodate srcdir-relative paths from within the objdir.
+            candidate = mozpath.join(self.topsrcdir, path)
+            if os.path.exists(candidate):
+                path = candidate
+            else:
+                # Assume we're running from the objdir, and abspath is as
+                # good as mozpath.join(self.topobjdir, ...)
+                path = mozpath.abspath(path)
         if not os.path.exists(path):
             print('specified path does not exist: %s' % path)
             return 1
+
+        # We resolve symbolic links in Dependencies.  Do the same here so
+        # we get consistent results.
+        path = os.path.realpath(path)
 
         deps = self._get_deps(show_all=True, dont_resolve_paths=False)
 
