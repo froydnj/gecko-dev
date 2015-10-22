@@ -39,6 +39,7 @@ class Dependencies(object):
         self.topobjdir = topobjdir
         self.targets = {}
         self.dependencies = {}
+        self._realpath_cache = {}
         self._filemap = None
 
     def load_deps_file(self, objdir, fh):
@@ -50,7 +51,18 @@ class Dependencies(object):
 
                 normalized_deps = []
                 for d in rule.dependencies():
-                    full_depend = mozpath.normpath(mozpath.join(objdir, d))
+                    full_depend = mozpath.join(objdir, d)
+                    # Resolve symbolic links from $objdir/dist/include and
+                    # the like to their srcdir equivalents.  Don't use
+                    # _realpath_cache.get(full_depend, os.path.realpath(...)),
+                    # as the whole point of this cache is to avoid hitting
+                    # the filesystem if we don't have to.
+                    if full_depend in self._realpath_cache:
+                        full_depend = self._realpath_cache[full_depend]
+                    else:
+                        resolved = os.path.realpath(full_depend)
+                        self._realpath_cache[full_depend] = resolved
+                        full_depend = resolved
                     normalized_deps.append(full_depend)
                     self.dependencies.setdefault(full_depend, set()).add(full_target)
 
