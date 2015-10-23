@@ -10,7 +10,6 @@
 #include "nsCycleCollectionParticipant.h"
 #include "nsWrapperCache.h"
 #include "nsIGlobalObject.h"
-#include "mozilla/dom/CryptoKey.h"
 #include "js/TypeDecls.h"
 
 namespace mozilla {
@@ -18,7 +17,9 @@ namespace dom {
 
 class ObjectOrString;
 class Promise;
+class CryptoKey;
 
+class ArrayBufferViewOrArrayBuffer;
 typedef ArrayBufferViewOrArrayBuffer CryptoOperationData;
 
 class SubtleCrypto final : public nsISupports,
