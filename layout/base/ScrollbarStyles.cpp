@@ -5,6 +5,7 @@
 
 #include "ScrollbarStyles.h"
 #include "nsStyleStruct.h" // for nsStyleDisplay and nsStyleBackground::Position
+#include "mozilla/dom/WindowBinding.h"
 
 namespace mozilla {
 
@@ -29,4 +30,9 @@ namespace mozilla {
       mScrollSnapDestinationX(aDisplay->mScrollSnapDestination.mXPosition),
       mScrollSnapDestinationY(aDisplay->mScrollSnapDestination.mYPosition) {}
 
+  bool ScrollbarStyles::IsSmoothScroll(dom::ScrollBehavior aBehavior) const {
+    return aBehavior == dom::ScrollBehavior::Smooth ||
+            (aBehavior == dom::ScrollBehavior::Auto &&
+              mScrollBehavior == NS_STYLE_SCROLL_BEHAVIOR_SMOOTH);
+  }
 } // namespace mozilla

@@ -9,12 +9,15 @@
 #include <stdint.h>
 #include "nsStyleConsts.h" // for NS_STYLE_SCROLL_SNAP_*
 #include "nsStyleCoord.h" // for nsStyleCoord
-#include "mozilla/dom/WindowBinding.h"
 
 // Forward declarations
 struct nsStyleDisplay;
 
 namespace mozilla {
+
+namespace dom {
+enum class ScrollBehavior : uint32_t;
+} // namespace dom
 
 struct ScrollbarStyles
 {
@@ -70,11 +73,7 @@ struct ScrollbarStyles
     return mHorizontal == NS_STYLE_OVERFLOW_HIDDEN &&
            mVertical == NS_STYLE_OVERFLOW_HIDDEN;
   }
-  bool IsSmoothScroll(dom::ScrollBehavior aBehavior) const {
-    return aBehavior == dom::ScrollBehavior::Smooth ||
-             (aBehavior == dom::ScrollBehavior::Auto &&
-               mScrollBehavior == NS_STYLE_SCROLL_BEHAVIOR_SMOOTH);
-  }
+  bool IsSmoothScroll(dom::ScrollBehavior aBehavior) const;
 };
 
 } // namespace mozilla
