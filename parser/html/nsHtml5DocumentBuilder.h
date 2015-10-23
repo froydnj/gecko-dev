@@ -9,8 +9,8 @@
 
 #include "nsContentSink.h"
 #include "nsHtml5DocumentMode.h"
-#include "nsIDocument.h"
 #include "nsIContent.h"
+#include "nsIDocument.h"
 
 typedef nsIContent* nsIContentPtr;
 

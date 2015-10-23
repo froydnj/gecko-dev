@@ -20,7 +20,6 @@
 #include "nsCSSPseudoElements.h"
 #include "nsIAnonymousContentCreator.h"
 #include "nsFrameManager.h"
-#include "nsIDocument.h"
 
 struct nsFrameItems;
 class nsStyleContext;
@@ -30,6 +29,7 @@ struct nsGenConInitializer;
 class nsContainerFrame;
 class nsFirstLineFrame;
 class nsICSSAnonBoxPseudo;
+class nsIDocument;
 class nsPageContentFrame;
 struct PendingBinding;
 class nsGenericDOMDataNode;

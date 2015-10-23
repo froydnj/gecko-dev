@@ -8,6 +8,7 @@
 #include "LayersLogging.h"
 #include "nsViewManager.h"
 #include "nsViewportInfo.h"
+#include "nsIDocument.h"
 
 #define MVM_LOG(...)
 // #define MVM_LOG(...) printf_stderr("MVM: " __VA_ARGS__)
