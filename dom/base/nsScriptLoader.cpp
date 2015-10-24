@@ -1619,6 +1619,15 @@ nsScriptLoader::PrepareLoadedRequest(nsScriptLoadRequest* aRequest,
 }
 
 void
+nsScriptLoader::BeginDeferringScripts()
+{
+  mDeferEnabled = true;
+  if (mDocument) {
+    mDocument->BlockOnload();
+  }
+}
+
+void
 nsScriptLoader::ParsingComplete(bool aTerminated)
 {
   if (mDeferEnabled) {

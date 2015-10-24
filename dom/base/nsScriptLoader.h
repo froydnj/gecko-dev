@@ -376,13 +376,7 @@ public:
    * Starts deferring deferred scripts and puts them in the mDeferredRequests
    * queue instead.
    */
-  void BeginDeferringScripts()
-  {
-    mDeferEnabled = true;
-    if (mDocument) {
-      mDocument->BlockOnload();
-    }
-  }
+  void BeginDeferringScripts();
 
   /**
    * Notifies the script loader that parsing is done.  If aTerminated is true,
