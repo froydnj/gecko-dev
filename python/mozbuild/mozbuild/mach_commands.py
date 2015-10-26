@@ -351,16 +351,8 @@ class DependenciesProvider(MachCommandBase):
     @CommandArgument('path',
         help='Find targets that depend on a certain file')
     def targets(self, path, source=False):
-        if not os.path.isabs(path):
-            # Accommodate srcdir-relative paths from within the objdir.
-            candidate = mozpath.join(self.topsrcdir, path)
-            if os.path.exists(candidate):
-                path = candidate
-            else:
-                # Assume we're running from the objdir, and abspath is as
-                # good as mozpath.join(self.topobjdir, ...)
-                path = mozpath.abspath(path)
-        if not os.path.exists(path):
+        path = self._resolve_path(path)
+        if not path:
             print('specified path does not exist: %s' % path)
             return 1
 
@@ -373,6 +365,21 @@ class DependenciesProvider(MachCommandBase):
         targets = deps.get_targets(path, resolve_source=source)
         for t in sorted(self._normalize_path(t) for t in targets):
             print(t)
+
+    def _resolve_dep_file(self, path):
+        if not os.path.isabs(path):
+            # Accommodate srcdir-relative paths from within the objdir.
+            candidate = mozpath.join(self.topsrcdir, path)
+            if os.path.exists(candidate):
+                path = candidate
+            else:
+                # Assume we're running from the objdir, and abspath is as
+                # good as mozpath.join(self.topobjdir, ...)
+                path = mozpath.abspath(path)
+        if not os.path.exists(path):
+            return None
+
+        return path
 
     def _get_deps(self, **kwargs):
         from mozbuild.analyze import Dependencies, find_deps_files
