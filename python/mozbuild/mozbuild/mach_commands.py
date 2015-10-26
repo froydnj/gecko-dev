@@ -344,6 +344,28 @@ class DependenciesProvider(MachCommandBase):
 
             print('%d\t%s' % (len(deps[d]), d))
 
+    @SubCommand('dependencies', 'how-did-i-include',
+        description='Print include stack for a given file')
+    @CommandArgument('include_file',
+        help='File being included')
+    # XXX figure out how to provide multiple objects at once.
+    @CommandArgument('obj_file',
+        help='Object file')
+    def how_did_i_include(self, include_file, obj_file):
+        path = self._resolve_path(include_file)
+        if not path:
+            print('specified path does not exist: %s' % include_file)
+            return 1
+
+        obj_dir = os.path.dirname(obj_file)
+        obj_base = os.path.basename(obj_file)
+
+        # cd obj_dir
+        # invoke make -B -n | tail -n 1
+        # add -fsyntax-only -H to the command line
+        # run that command
+        # capture stderr
+        
     @SubCommand('dependencies', 'targets',
         description='Print targets having a dependency.')
     @CommandArgument('--source', action='store_true',
