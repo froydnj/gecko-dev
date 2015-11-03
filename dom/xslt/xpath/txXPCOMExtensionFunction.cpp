@@ -17,6 +17,7 @@
 #include "xptcall.h"
 #include "txXPathObjectAdaptor.h"
 #include "mozilla/Attributes.h"
+#include "mozilla/UniquePtr.h"
 #include "nsIClassInfo.h"
 #include "nsIInterfaceInfo.h"
 
@@ -307,11 +308,11 @@ public:
     bool Init(uint8_t aCount);
     operator nsXPTCVariant*() const
     {
-      return mArray;
+      return mArray.get();
     }
 
 private:
-    nsAutoArrayPtr<nsXPTCVariant> mArray;
+    mozilla::UniquePtr<nsXPTCVariant[]> mArray;
     uint8_t mCount;
 };
 
@@ -338,8 +339,12 @@ bool
 txParamArrayHolder::Init(uint8_t aCount)
 {
     mCount = aCount;
-    mArray = new nsXPTCVariant[mCount];
-    memset(mArray, 0, mCount * sizeof(nsXPTCVariant));
+    mArray = mozilla::MakeUnique<nsXPTCVariant[]>(mCount);
+    if (!mArray) {
+        return false;
+    }
+
+    memset(mArray.get(), 0, mCount * sizeof(nsXPTCVariant));
 
     return true;
 }
