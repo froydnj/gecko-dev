@@ -140,27 +140,39 @@ elif CONFIG['CLANG_CL']:
 DEFINES['SKIA_IMPLEMENTATION'] = 1
 DEFINES['GR_IMPLEMENTATION'] = 1
 
+# Suppress warnings in third-party code.
+gcc_compatible_warning_flags = [
+    '-Wno-deprecated-declarations',
+    '-Wno-overloaded-virtual',
+    '-Wno-sign-compare',
+    '-Wno-unused-function',
+]
+
+gcc_only_warning_flags = [
+    '-Wno-logical-op',
+    '-Wno-maybe-uninitialized',
+]
+
+clang_only_warning_flags = [
+    '-Wno-implicit-fallthrough',
+    '-Wno-inconsistent-missing-override',
+    '-Wno-macro-redefined',
+    '-Wno-unused-private-field',
+]
+
 if CONFIG['GNU_CXX']:
-    CXXFLAGS += [
-        '-Wno-deprecated-declarations',
-        '-Wno-overloaded-virtual',
-        '-Wno-sign-compare',
-        '-Wno-unused-function',
-    ]
+    CXXFLAGS += gcc_compatible_warning_flags
     if CONFIG['CLANG_CXX']:
-        CXXFLAGS += [
-            '-Wno-implicit-fallthrough',
-            '-Wno-inconsistent-missing-override',
-            '-Wno-macro-redefined',
-            '-Wno-unused-private-field',
-        ]
+        CXXFLAGS += clang_only_warning_flags
     else:
-        CXXFLAGS += [
-            '-Wno-logical-op',
-            '-Wno-maybe-uninitialized',
-        ]
+        CXXFLAGS += gcc_only_warning_flags
     if CONFIG['CPU_ARCH'] == 'arm':
         SOURCES['skia/src/opts/SkBlitRow_opts_arm.cpp'].flags += ['-fomit-frame-pointer']
+elif CONFIG['CLANG_CL']:
+    CXXFLAGS += gcc_compatible_warning_flags
+    CXXFLAGS += clang_only_warning_flags
+    # Silence redefinitions of WIN32_LEAN_AND_MEAN
+    CXXFLAGS += ['-Wno-macro-redefined']
 
 if CONFIG['MOZ_WIDGET_TOOLKIT'] in ('gtk2', 'gtk3', 'android', 'gonk', 'qt'):
     CXXFLAGS += CONFIG['MOZ_CAIRO_CFLAGS']

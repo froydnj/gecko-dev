@@ -22,10 +22,21 @@ FINAL_LIBRARY = 'gkmedias'
 DEFINES['THEORA_DISABLE_ENCODE'] = True
 
 # Suppress warnings in third-party code.
+gcc_compatible_warning_flags = ['-Wno-type-limits']
+
+clang_only_warning_flags = ['-Wno-tautological-compare']
+
 if CONFIG['GNU_CC']:
-    CFLAGS += ['-Wno-type-limits']
+    CFLAGS += gcc_compatible_warning_flags
     if CONFIG['CLANG_CXX']:
-        CFLAGS += ['-Wno-tautological-compare']
+        CFLAGS += clang_only_warning_flags
+elif CONFIG['CLANG_CL']:
+    CFLAGS += gcc_compatible_warning_flags
+    CFLAGS += clang_only_warning_flags
+    CFLAGS += [
+        '-Wno-pointer-sign',
+        '-Wno-shift-op-parentheses',
+    ]
 
 UNIFIED_SOURCES += [
     'lib/apiwrapper.c',

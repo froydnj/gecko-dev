@@ -140,18 +140,28 @@ if use_arm_neon_gcc:
     SOURCES['pixman-arm-neon.c'].flags += ['-mfpu=neon']
 
 # Suppress warnings in third-party code.
+gcc_compatible_warning_flags = [
+    '-Wno-address',
+    '-Wno-sign-compare',
+    '-Wno-missing-field-initializers',
+]
+
+clang_only_warning_flags = [
+    '-Wno-incompatible-pointer-types',
+    '-Wno-tautological-compare',
+    '-Wno-tautological-constant-out-of-range-compare',
+]
+
 if CONFIG['GNU_CC']:
-    CFLAGS += [
-        '-Wno-address',
-        '-Wno-sign-compare',
-        '-Wno-missing-field-initializers',
-    ]
+    CFLAGS += gcc_compatible_warning_flags
     if CONFIG['CLANG_CXX']:
-        CFLAGS += [
-            '-Wno-incompatible-pointer-types',
-            '-Wno-tautological-compare',
-            '-Wno-tautological-constant-out-of-range-compare',
-        ]
+        CFLAGS += clang_only_warning_flags
+elif CONFIG['CLANG_CL']:
+    CFLAGS += gcc_compatible_warning_flags
+    CFLAGS += clang_only_warning_flags
+    CFLAGS += [
+        '-Wno-unused-variable',
+    ]
 
 # See bug 386897.
 if CONFIG['OS_TARGET'] == 'Android' and CONFIG['MOZ_OPTIMIZE']:

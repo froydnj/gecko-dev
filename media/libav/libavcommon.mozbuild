@@ -29,19 +29,26 @@ else:
 LOCAL_INCLUDES += ['/media/libav']
 
 # Suppress warnings in third-party code.
+gcc_compatible_warning_flags = [
+    '-Wno-parentheses',
+    '-Wno-pointer-sign',
+    '-Wno-sign-compare',
+    '-Wno-switch',
+    '-Wno-type-limits',
+]
+
+clang_only_warning_flags = [
+    '-Wno-incompatible-pointer-types-discards-qualifiers',
+    '-Wno-logical-op-parentheses',
+]
+
 if CONFIG['GNU_CC']:
-    CFLAGS += [
-        '-Wno-parentheses',
-        '-Wno-pointer-sign',
-        '-Wno-sign-compare',
-        '-Wno-switch',
-        '-Wno-type-limits',
-    ]
+    CFLAGS += gcc_compatible_warning_flags
     if CONFIG['CLANG_CXX']:
-        CFLAGS += [
-            '-Wno-incompatible-pointer-types-discards-qualifiers',
-            '-Wno-logical-op-parentheses',
-        ]
+        CFLAGS += clang_only_warning_flags
+elif CONFIG['CLANG_CL']:
+    CFLAGS += gcc_compatible_warning_flags
+    CFLAGS += clang_only_warning_flags
 elif CONFIG['_MSC_VER']:
     CFLAGS += [
         '-wd4090', # 'return' : different 'const' qualifiers

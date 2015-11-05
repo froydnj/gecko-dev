@@ -220,22 +220,34 @@ if CONFIG['MOZ_TREE_FREETYPE']:
     DEFINES['FT_LCD_FILTER_H'] = '%s/modules/freetype2/include/freetype/ftlcdfil.h' % TOPSRCDIR
 
 # Suppress warnings in third-party code.
+gcc_compatible_warning_flags = [
+    '-Wno-enum-compare',
+    '-Wno-int-to-pointer-cast',
+    '-Wno-sign-compare',
+    '-Wno-type-limits',
+    '-Wno-missing-field-initializers',
+    '-Wno-conversion',
+]
+
+clang_only_warning_flags = [
+    '-Wno-incompatible-pointer-types',
+    '-Wno-tautological-compare',
+    '-Wno-tautological-constant-out-of-range-compare',
+    '-Wno-error=uninitialized',
+]
+
 if CONFIG['GNU_CC']:
-    CFLAGS += [
-        '-Wno-enum-compare',
-        '-Wno-int-to-pointer-cast',
-        '-Wno-sign-compare',
-        '-Wno-type-limits',
-        '-Wno-missing-field-initializers',
-        '-Wno-conversion',
-    ]
+    CFLAGS += gcc_compatible_warning_flags
     if CONFIG['CLANG_CXX']:
-        CFLAGS += [
-            '-Wno-incompatible-pointer-types',
-            '-Wno-tautological-compare',
-            '-Wno-tautological-constant-out-of-range-compare',
-            '-Wno-error=uninitialized',
-        ]
+        CFLAGS += clang_only_warning_flags
+elif CONFIG['CLANG_CL']:
+    CFLAGS += gcc_compatible_warning_flags
+    CFLAGS += clang_only_warning_flags
+    CFLAGS += [
+        '-Wno-deprecated-register',
+        '-Wno-macro-redefined',
+        '-Wno-unused-variable',
+    ]
 
 # See bug 386897.
 if CONFIG['GNU_CC'] and CONFIG['OS_TARGET'] == 'Android' and CONFIG['MOZ_OPTIMIZE']:

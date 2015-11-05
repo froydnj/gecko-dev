@@ -82,8 +82,12 @@ if CONFIG['CLANG_CL'] or not CONFIG['_MSC_VER']:
                 SOURCES[f].flags += ['-mavx2']
 
 # Suppress warnings in third-party code.
+gcc_compatible_warning_flags = ['-Wno-sign-compare']
+
 if CONFIG['GNU_CC']:
-    CFLAGS += ['-Wno-sign-compare']
+    CFLAGS += gcc_compatible_warning_flags
+elif CONFIG['CLANG_CL']:
+    CFLAGS += gcc_compatible_warning_flags
 
 ASFLAGS += CONFIG['VPX_ASFLAGS']
 ASFLAGS += [
