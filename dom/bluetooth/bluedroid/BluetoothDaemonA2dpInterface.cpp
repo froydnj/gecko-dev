@@ -54,19 +54,7 @@ BluetoothDaemonA2dpModule::ConnectCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(new DaemonSocketPDU(SERVICE_ID,
-                                                     OPCODE_CONNECT,
-                                                     6)); // Address
-  nsresult rv = PackPDU(aRemoteAddr, *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_CONNECT, 6, aRes, aRemoteAddr);
 }
 
 nsresult
@@ -75,19 +63,7 @@ BluetoothDaemonA2dpModule::DisconnectCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(new DaemonSocketPDU(SERVICE_ID,
-                                                     OPCODE_DISCONNECT,
-                                                     6)); // Address
-  nsresult rv = PackPDU(aRemoteAddr, *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_DISCONNECT, 6, aRes, aRemoteAddr);
 }
 
 // Responses
