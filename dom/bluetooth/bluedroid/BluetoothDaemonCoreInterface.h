@@ -337,6 +337,27 @@ private:
   void HandleNtf(const DaemonSocketPDUHeader& aHeader,
                  DaemonSocketPDU& aPDU, DaemonSocketResultHandler* aRes);
 
+  template<typename... PacketArgs>
+  nsresult
+  PackAndSend(uint8_t aOpcode, uint16_t aPayloadSize,
+              BluetoothResultHandler* aRes,
+              PacketArgs... aArgs)
+  {
+    nsAutoPtr<DaemonSocketPDU> pdu =
+      new DaemonSocketPDU(SERVICE_ID, aOpcode, aPayloadSize);
+
+    nsresult rv = PackPDU(aArgs..., *pdu);
+    if (NS_FAILED(rv)) {
+      return rv;
+    }
+    rv = Send(pdu, aRes);
+    if (NS_FAILED(rv)) {
+      return rv;
+    }
+    Unused << pdu.forget();
+    return rv;
+  }
+
   static BluetoothCoreNotificationHandler* sNotificationHandler;
 };
 
