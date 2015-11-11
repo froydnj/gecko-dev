@@ -54,22 +54,12 @@ BluetoothDaemonAvrcpModule::GetPlayStatusRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_GET_PLAY_STATUS_RSP,
-                           1 + // Play status
-                           4 + // Duration
-                           4)); // Position
-
-  nsresult rv = PackPDU(aPlayStatus, aSongLen, aSongPos, *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_GET_PLAY_STATUS_RSP,
+                     1 + // Play status
+                     4 + // Duration
+                     4, // Position
+                     aRes,
+                     aPlayStatus, aSongLen, aSongPos);
 }
 
 nsresult
@@ -79,23 +69,12 @@ BluetoothDaemonAvrcpModule::ListPlayerAppAttrRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_LIST_PLAYER_APP_ATTR_RSP,
-                           1 + // # Attributes
-                           aNumAttr)); // Player attributes
-
-  nsresult rv = PackPDU(
-    PackConversion<int, uint8_t>(aNumAttr),
-    PackArray<BluetoothAvrcpPlayerAttribute>(aPAttrs, aNumAttr), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_LIST_PLAYER_APP_ATTR_RSP,
+                     1 + // # Attributes
+                     aNumAttr, // Player attributes
+                     aRsp,
+                     PackConversion<int, uint8_t>(aNumAttr),
+                     PackArray<BluetoothAvrcpPlayerAttribute>(aPAttrs, aNumAttr));
 }
 
 nsresult
@@ -104,22 +83,12 @@ BluetoothDaemonAvrcpModule::ListPlayerAppValueRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_LIST_PLAYER_APP_VALUE_RSP,
-                           1 + // # Values
-                           aNumVal)); // Player values
-
-  nsresult rv = PackPDU(PackConversion<int, uint8_t>(aNumVal),
-                        PackArray<uint8_t>(aPVals, aNumVal), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_LIST_PLAYER_APP_VALUE_RSP,
+                     1 + // # Values
+                     aNumVal, // Player values
+                     aRsp,
+                     PackConversion<int, uint8_t>(aNumVal),
+                     PackArray<uint8_t>(aPVals, aNumVal));
 }
 
 nsresult
@@ -129,22 +98,12 @@ BluetoothDaemonAvrcpModule::GetPlayerAppValueRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_GET_PLAYER_APP_VALUE_RSP,
-                           1 + // # Pairs
-                           2 * aNumAttrs)); // Attribute-value pairs
-  nsresult rv = PackPDU(
-    aNumAttrs,
-    BluetoothAvrcpAttributeValuePairs(aIds, aValues, aNumAttrs), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_GET_PLAYER_APP_VALUE_RSP,
+                     1 + // # Pairs
+                     2 * aNumAttrs, // Attribute-value pairs
+                     aRsp,
+                     aNumAttrs,
+                     BluetoothAvrcpAttributeValuePairs(aIds, aValues, aNumAttrs));
 }
 
 nsresult
@@ -154,21 +113,11 @@ BluetoothDaemonAvrcpModule::GetPlayerAppAttrTextRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_GET_PLAYER_APP_ATTR_TEXT_RSP,
-                           0)); // Dynamically allocated
-  nsresult rv = PackPDU(
-    PackConversion<int, uint8_t>(aNumAttr),
-    BluetoothAvrcpAttributeTextPairs(aIds, aTexts, aNumAttr), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_GET_PLAYER_APP_ATTR_TEXT_RSP,
+                     0, // Dynamically allocated
+                     aRsp,
+                     PackConversion<int, uint8_t>(aNumAttr),
+                     BluetoothAvrcpAttributeTextPairs(aIds, aTexts, aNumAttr));
 }
 
 nsresult
@@ -178,21 +127,11 @@ BluetoothDaemonAvrcpModule::GetPlayerAppValueTextRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_GET_PLAYER_APP_VALUE_TEXT_RSP,
-                           0)); // Dynamically allocated
-  nsresult rv = PackPDU(
-    PackConversion<int, uint8_t>(aNumVal),
-    BluetoothAvrcpAttributeTextPairs(aIds, aTexts, aNumVal), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_GET_PLAYER_APP_VALUE_TEXT_RSP,
+                     0, // Dynamically allocated
+                     aRsp,
+                     PackConversion<int, uint8_t>(aNumVal),
+                     BluetoothAvrcpAttributeTextPairs(aIds, aTexts, aNumVal));
 }
 
 nsresult
@@ -202,21 +141,11 @@ BluetoothDaemonAvrcpModule::GetElementAttrRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_GET_ELEMENT_ATTR_RSP,
-                           0)); // Dynamically allocated
-  nsresult rv = PackPDU(
-    aNumAttr,
-    PackArray<BluetoothAvrcpElementAttribute>(aAttr, aNumAttr), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_GET_ELEMENT_ATTR_RSP,
+                     0, // Dynamically allocated
+                     aRsp,
+                     aNumAttr,
+                     PackArray<BluetoothAvrcpElementAttribute>(aAttr, aNumAttr));
 }
 
 nsresult
@@ -225,20 +154,9 @@ BluetoothDaemonAvrcpModule::SetPlayerAppValueRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_SET_PLAYER_APP_VALUE_RSP,
-                           1)); // Status code
-
-  nsresult rv = PackPDU(aRspStatus, *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_SET_PLAYER_APP_VALUE_RSP,
+                     1, // Status code
+                     aRsp, aRspStatus);
 }
 
 nsresult
@@ -249,25 +167,14 @@ BluetoothDaemonAvrcpModule::RegisterNotificationRspCmd(
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_REGISTER_NOTIFICATION_RSP,
-                           1 + // Event
-                           1 + // Type
-                           1 + // Data length
-                           256)); // Maximum data length
-
   BluetoothAvrcpEventParamPair data(aEvent, aParam);
-  nsresult rv = PackPDU(aEvent, aType, static_cast<uint8_t>(data.GetLength()),
-                        data, *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_REGISTER_NOTIFICATION_RSP,
+                     1 + // Event
+                     1 + // Type
+                     1 + // Data length
+                     256, // Maximum data length
+                     aRsp, aEvent, aType,
+                     static_cast<uint8_t>(data.GetLength()), data);
 }
 
 nsresult
@@ -276,20 +183,9 @@ BluetoothDaemonAvrcpModule::SetVolumeCmd(uint8_t aVolume,
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_SET_VOLUME,
-                           1)); // Volume
-
-  nsresult rv = PackPDU(aVolume, *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return NS_OK;
+  return PackAndSend(OPCODE_SET_VOLUME,
+                     1, // Volume
+                     aRsp, aVolume);
 }
 
 // Responses
