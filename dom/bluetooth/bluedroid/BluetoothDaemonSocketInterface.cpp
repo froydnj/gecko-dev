@@ -32,25 +32,10 @@ BluetoothDaemonSocketModule::ListenCmd(BluetoothSocketType aType,
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_LISTEN,
-                        0));
-
-  nsresult rv = PackPDU(
-    aType,
-    aServiceName,
-    aServiceUuid,
-    PackConversion<int, int32_t>(aChannel),
-    SocketFlags(aEncrypt, aAuth), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return rv;
+  return PackAndSend(OPCODE_LISTEN, 0, aRes,
+                     aType, aServiceName, aServiceUuid,
+                     PackConversion<int, int32_t>(aChannel),
+                     SocketFlags(aEncrypt, aAuth));
 }
 
 nsresult
@@ -63,25 +48,10 @@ BluetoothDaemonSocketModule::ConnectCmd(const BluetoothAddress& aBdAddr,
 {
   MOZ_ASSERT(NS_IsMainThread());
 
-  nsAutoPtr<DaemonSocketPDU> pdu(
-    new DaemonSocketPDU(SERVICE_ID, OPCODE_CONNECT,
-                        0));
-
-  nsresult rv = PackPDU(
-    aBdAddr,
-    aType,
-    aServiceUuid,
-    PackConversion<int, int32_t>(aChannel),
-    SocketFlags(aEncrypt, aAuth), *pdu);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  rv = Send(pdu, aRes);
-  if (NS_FAILED(rv)) {
-    return rv;
-  }
-  Unused << pdu.forget();
-  return rv;
+  return PackAndSend(OPCODE_CONNECT, 0, aRes,
+                     aBdAddr, aType, aServiceUuid,
+                     PackConversion<int, int32_t>(aChannel),
+                     SocketFlags(aEncrypt, aAuth));
 }
 
 /* |DeleteTask| deletes a class instance on the I/O thread
