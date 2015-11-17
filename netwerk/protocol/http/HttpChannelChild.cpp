@@ -293,6 +293,14 @@ NS_INTERFACE_MAP_BEGIN(HttpChannelChild)
   NS_INTERFACE_MAP_ENTRY(nsIHttpChannel)
   NS_INTERFACE_MAP_ENTRY(nsIHttpChannelInternal)
   NS_INTERFACE_MAP_ENTRY(nsICacheInfoChannel)
+    if (aIID.Equals(NS_GET_IID(nsICachingChannel))) {
+        if (!XRE_IsParentProcess()) {
+            nsCString msg;
+            msg.AppendLiteral("nsICachingChannel is only available in the parent process!");
+            NECKO_MAYBE_ABORT(msg);
+        }
+        MOZ_CRASH();
+    } else
   NS_INTERFACE_MAP_ENTRY(nsIResumableChannel)
   NS_INTERFACE_MAP_ENTRY(nsISupportsPriority)
   NS_INTERFACE_MAP_ENTRY(nsIClassOfService)
