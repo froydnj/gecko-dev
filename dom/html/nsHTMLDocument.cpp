@@ -70,7 +70,7 @@
 #include "nsJSUtils.h"
 #include "nsIDocumentInlines.h"
 #include "nsIDocumentEncoder.h" //for outputting selection
-#include "nsICachingChannel.h"
+#include "nsICacheInfoChannel.h"
 #include "nsIContentViewer.h"
 #include "nsIWyciwygChannel.h"
 #include "nsIScriptElement.h"
@@ -347,7 +347,7 @@ nsHTMLDocument::TryUserForcedCharset(nsIContentViewer* aCv,
 }
 
 void
-nsHTMLDocument::TryCacheCharset(nsICachingChannel* aCachingChannel,
+nsHTMLDocument::TryCacheCharset(nsICacheInfoChannel* aCachingChannel,
                                 int32_t& aCharsetSource,
                                 nsACString& aCharset)
 {
@@ -592,7 +592,7 @@ nsHTMLDocument::StartDocumentLoad(const char* aCommand,
     return rv;
   }
 
-  nsCOMPtr<nsICachingChannel> cachingChan = do_QueryInterface(aChannel);
+  nsCOMPtr<nsICacheInfoChannel> cachingChan = do_QueryInterface(aChannel);
 
   if (loadAsHtml5) {
     mParser = nsHtml5Module::NewHtml5Parser();

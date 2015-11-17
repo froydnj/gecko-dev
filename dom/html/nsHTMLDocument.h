@@ -24,7 +24,7 @@
 class nsIEditor;
 class nsIURI;
 class nsIDocShell;
-class nsICachingChannel;
+class nsICacheInfoChannel;
 class nsIWyciwygChannel;
 class nsILoadGroup;
 
@@ -307,7 +307,7 @@ protected:
                             nsIDocShell*  aDocShell,
                             int32_t& aCharsetSource,
                             nsACString& aCharset);
-  static void TryCacheCharset(nsICachingChannel* aCachingChannel,
+  static void TryCacheCharset(nsICacheInfoChannel* aCachingChannel,
                                 int32_t& aCharsetSource,
                                 nsACString& aCharset);
   void TryParentCharset(nsIDocShell*  aDocShell,
