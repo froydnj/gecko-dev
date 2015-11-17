@@ -22,7 +22,7 @@
 
 class nsIURI;
 class nsIDocShell;
-class nsICachingChannel;
+class nsICacheInfoChannel;
 class nsIWyciwygChannel;
 class nsILoadGroup;
 
@@ -307,7 +307,7 @@ protected:
                             nsIDocShell*  aDocShell,
                             int32_t& aCharsetSource,
                             NotNull<const Encoding*>& aEncoding);
-  static void TryCacheCharset(nsICachingChannel* aCachingChannel,
+  static void TryCacheCharset(nsICacheInfoChannel* aCachingChannel,
                               int32_t& aCharsetSource,
                               NotNull<const Encoding*>& aEncoding);
   void TryParentCharset(nsIDocShell*  aDocShell,
