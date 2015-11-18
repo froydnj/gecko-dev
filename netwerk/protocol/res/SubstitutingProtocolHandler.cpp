@@ -117,13 +117,14 @@ SubstitutingProtocolHandler::CollectSubstitutions(InfallibleTArray<SubstitutionM
 {
   for (auto iter = mSubstitutions.ConstIter(); !iter.Done(); iter.Next()) {
     nsCOMPtr<nsIURI> uri = iter.Data();
+    SubstitutionMapping* substitution = arg->mMappings.AppendElement();
+    substitution->scheme = mScheme;
+    substitution->path = iter.Key();
     SerializedURI serialized;
     if (uri) {
-      uri->GetSpec(serialized.spec);
-      uri->GetOriginCharset(serialized.charset);
+      uri->GetSpec(substitution->resolvedURI.spec);
+      uri->GetOriginCharset(substitution->resolvedURI.charset);
     }
-    SubstitutionMapping substitution = { mScheme, nsCString(iter.Key()), serialized };
-    aMappings.AppendElement(substitution);
   }
 }
 
