@@ -61,6 +61,8 @@ public:
 protected:
     ~nsViewSourceChannel() {}
 
+    void SetupChannels();
+
     nsCOMPtr<nsIChannel>        mChannel;
     nsCOMPtr<nsIHttpChannel>    mHttpChannel;
     nsCOMPtr<nsIHttpChannelInternal>    mHttpChannelInternal;
