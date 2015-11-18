@@ -14,6 +14,7 @@
 #include "NullPrincipal.h"
 #include "nsServiceManagerUtils.h"
 #include "nsIInputStreamChannel.h"
+#include "nsXULAppAPI.h"
 #include "mozilla/DebugOnly.h"
 
 NS_IMPL_ADDREF(nsViewSourceChannel)
@@ -85,7 +86,10 @@ nsViewSourceChannel::Init(nsIURI* uri)
     mChannel->SetOriginalURI(mOriginalURI);
     mHttpChannel = do_QueryInterface(mChannel);
     mHttpChannelInternal = do_QueryInterface(mChannel);
-    mCachingChannel = do_QueryInterface(mChannel);
+    // nsICachingChannel is only available in the parent process.
+    if (XRE_IsParentProcess()) {
+        mCachingChannel = do_QueryInterface(mChannel);
+    }
     mCacheInfoChannel = do_QueryInterface(mChannel);
     mApplicationCacheChannel = do_QueryInterface(mChannel);
     mUploadChannel = do_QueryInterface(mChannel);
@@ -124,7 +128,10 @@ nsViewSourceChannel::InitSrcdoc(nsIURI* aURI,
     mChannel->SetOriginalURI(mOriginalURI);
     mHttpChannel = do_QueryInterface(mChannel);
     mHttpChannelInternal = do_QueryInterface(mChannel);
-    mCachingChannel = do_QueryInterface(mChannel);
+    // nsICachingChannel is only available in the parent process.
+    if (XRE_IsParentProcess()) {
+        mCachingChannel = do_QueryInterface(mChannel);
+    }
     mCacheInfoChannel = do_QueryInterface(mChannel);
     mApplicationCacheChannel = do_QueryInterface(mChannel);
     mUploadChannel = do_QueryInterface(mChannel);
@@ -208,6 +215,20 @@ nsViewSourceChannel::BuildViewSourceURI(nsIURI * aURI, nsIURI ** aResult)
                      non-flat specs.  See bug 136980 */
                      nsAutoCString(NS_LITERAL_CSTRING("view-source:") + spec),
                      nullptr);
+}
+
+void
+nsViewSourceChannel::SetupChannels()
+{
+    mHttpChannel = do_QueryInterface(mChannel);
+    mHttpChannelInternal = do_QueryInterface(mChannel);
+    // nsICachingChannel is only available in the parent process.
+    if (XRE_IsParentProcess()) {
+        mCachingChannel = do_QueryInterface(mChannel);
+    }
+    mCacheInfoChannel = do_QueryInterface(mChannel);
+    mApplicationCacheChannel = do_QueryInterface(mChannel);
+    mUploadChannel = do_QueryInterface(mChannel);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -729,7 +750,9 @@ nsViewSourceChannel::OnStartRequest(nsIRequest *aRequest, nsISupports *aContext)
     // The channel may have gotten redirected... Time to update our info
     mChannel = do_QueryInterface(aRequest);
     mHttpChannel = do_QueryInterface(aRequest);
-    mCachingChannel = do_QueryInterface(aRequest);
+    if (XRE_IsParentProcess()) {
+        mCachingChannel = do_QueryInterface(aRequest);
+    }
     mCacheInfoChannel = do_QueryInterface(mChannel);
     mUploadChannel = do_QueryInterface(aRequest);
 

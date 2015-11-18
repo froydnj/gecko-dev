@@ -67,6 +67,7 @@ protected:
 
     // Clones aURI and prefixes it with "view-source:" schema,
     nsresult BuildViewSourceURI(nsIURI* aURI, nsIURI** aResult);
+    void SetupChannels();
 
     nsCOMPtr<nsIChannel>        mChannel;
     nsCOMPtr<nsIHttpChannel>    mHttpChannel;
