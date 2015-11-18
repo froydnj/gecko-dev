@@ -251,11 +251,10 @@ nsPluginArray::GetSupportedNames(unsigned, nsTArray<nsString>& aRetval)
     return;
   }
 
-  for (uint32_t i = 0; i < mPlugins.Length(); ++i) {
-    nsAutoString pluginName;
-    mPlugins[i]->GetName(pluginName);
-
-    aRetval.AppendElement(pluginName);
+  uint32_t len = mPlugins.Length();
+  nsString* names = aRetval.AppendElements(len);
+  for (uint32_t i = 0; i < len; ++i) {
+    mPlugins[i]->GetName(names[i]);
   }
 }
 
