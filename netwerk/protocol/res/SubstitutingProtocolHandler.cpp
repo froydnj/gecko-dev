@@ -117,7 +117,7 @@ SubstitutingProtocolHandler::CollectSubstitutions(InfallibleTArray<SubstitutionM
 {
   for (auto iter = mSubstitutions.ConstIter(); !iter.Done(); iter.Next()) {
     nsCOMPtr<nsIURI> uri = iter.Data();
-    SubstitutionMapping* substitution = arg->mMappings.AppendElement();
+    SubstitutionMapping* substitution = aMappings.AppendElement();
     substitution->scheme = mScheme;
     substitution->path = iter.Key();
     SerializedURI serialized;
