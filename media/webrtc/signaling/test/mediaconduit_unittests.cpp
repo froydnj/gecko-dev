@@ -13,6 +13,7 @@ using namespace std;
 
 #include "mozilla/Scoped.h"
 #include "mozilla/SyncRunnable.h"
+#include "mozilla/UniquePtr.h"
 #include <MediaConduitInterface.h>
 #include "GmpVideoCodec.h"
 #include "nsIEventTarget.h"
@@ -285,8 +286,8 @@ void AudioSendAndReceive::GenerateMusic(short* buf, int len)
 //Hardcoded for 16 bit samples for now
 void AudioSendAndReceive::GenerateAndReadSamples()
 {
-   mozilla::ScopedDeletePtr<int16_t> audioInput(new int16_t [PLAYOUT_SAMPLE_LENGTH]);
-   mozilla::ScopedDeletePtr<int16_t> audioOutput(new int16_t [PLAYOUT_SAMPLE_LENGTH]);
+   mozilla::UniquePtr<int16_t[]> audioInput(mozilla::MakeUnique<int16_t []>(PLAYOUT_SAMPLE_LENGTH));
+   mozilla::UniquePtr<int16_t[]> audioOutput(mozilla::MakeUnique<int16_t []>(PLAYOUT_SAMPLE_LENGTH));
    short* inbuf;
    int sampleLengthDecoded = 0;
    unsigned int SAMPLES = (PLAYOUT_SAMPLE_FREQUENCY * 10); //10 seconds
