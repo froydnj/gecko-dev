@@ -1130,7 +1130,7 @@ HTMLInputElement::AfterSetAttr(int32_t aNameSpaceID, nsIAtom* aName,
       }
 
       if (mType == NS_FORM_INPUT_PASSWORD && IsInComposedDoc()) {
-        AsyncEventDispatcher* dispatcher =
+        RefPtr<AsyncEventDispatcher> dispatcher =
           new AsyncEventDispatcher(this,
                                    NS_LITERAL_STRING("DOMInputPasswordAdded"),
                                    true,
@@ -4228,7 +4228,7 @@ HTMLInputElement::BindToTree(nsIDocument* aDocument, nsIContent* aParent,
 
   if (mType == NS_FORM_INPUT_PASSWORD) {
     if (IsInComposedDoc()) {
-      AsyncEventDispatcher* dispatcher =
+      RefPtr<AsyncEventDispatcher> dispatcher =
         new AsyncEventDispatcher(this,
                                  NS_LITERAL_STRING("DOMInputPasswordAdded"),
                                  true,
