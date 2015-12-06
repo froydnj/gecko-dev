@@ -696,19 +696,12 @@ GenerateType3Msg(const nsString &domain,
     ntlmHashStr = nsAutoCString(
       mozilla::BitwiseCast<const char*, const uint8_t*>(ntlmHash), NTLM_HASH_LEN);
 
-    nsCOMPtr<nsIKeyObjectFactory> keyFactory =
-        do_CreateInstance(NS_KEYMODULEOBJECTFACTORY_CONTRACTID, &rv);
-
-    if (NS_FAILED(rv)) {
-      return rv;
+    nsCOMPtr<nsIKeyObjectFactory> keyFactory = new nsKeyObjectFactory();
+    if (!keyFactory) {
+      return NS_ERROR_FAILURE;
     }
 
-    nsCOMPtr<nsIKeyObject> ntlmKey =
-        do_CreateInstance(NS_KEYMODULEOBJECT_CONTRACTID, &rv);
-    if (NS_FAILED(rv)) {
-      return rv;
-    }
-
+    nsCOMPtr<nsIKeyObject> ntlmKey;
     rv = keyFactory->KeyFromString(nsIKeyObject::HMAC, ntlmHashStr, getter_AddRefs(ntlmKey));
     if (NS_FAILED(rv)) {
       return rv;
@@ -740,12 +733,7 @@ GenerateType3Msg(const nsString &domain,
     uint8_t client_random[NTLM_CHAL_LEN];
     PK11_GenerateRandom(client_random, NTLM_CHAL_LEN);
 
-    nsCOMPtr<nsIKeyObject> ntlmv2Key =
-        do_CreateInstance(NS_KEYMODULEOBJECT_CONTRACTID, &rv);
-    if (NS_FAILED(rv)) {
-      return rv;
-    }
-
+    nsCOMPtr<nsIKeyObject> ntlmv2Key;
     // Prepare the LMv2 response
     rv = keyFactory->KeyFromString(nsIKeyObject::HMAC, ntlmv2HashStr, getter_AddRefs(ntlmv2Key));
     if (NS_FAILED(rv)) {

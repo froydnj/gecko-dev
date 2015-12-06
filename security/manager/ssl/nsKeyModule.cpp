@@ -74,11 +74,9 @@ nsKeyObjectFactory::KeyFromString(int16_t aAlgorithm, const nsACString& aKey,
   CK_MECHANISM_TYPE cipherMech = CKM_GENERIC_SECRET_KEY_GEN;
   CK_ATTRIBUTE_TYPE cipherOperation = CKA_SIGN;
 
-  nsresult rv;
-  nsCOMPtr<nsIKeyObject> key(
-    do_CreateInstance(NS_KEYMODULEOBJECT_CONTRACTID, &rv));
-  if (NS_FAILED(rv)) {
-    return rv;
+  nsCOMPtr<nsIKeyObject> key = new nsKeyObject();
+  if (!key) {
+    return NS_ERROR_FAILURE;
   }
 
   // Convert the raw string into a SECItem
@@ -99,7 +97,7 @@ nsKeyObjectFactory::KeyFromString(int16_t aAlgorithm, const nsACString& aKey,
     return NS_ERROR_FAILURE;
   }
 
-  rv = key->InitKey(aAlgorithm, symKey.release());
+  nsresult rv = key->InitKey(aAlgorithm, symKey.release());
   if (NS_FAILED(rv)) {
     return rv;
   }
