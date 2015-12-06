@@ -17,6 +17,7 @@
 #include "nsDependentString.h"
 #include "nsDirectoryServiceUtils.h"
 #include "nsICryptoHash.h"
+#include "nsCryptoHash.h"
 #include "nsIFileStreams.h"
 #include "nsILineInputStream.h"
 #include "nsISafeOutputStream.h"
@@ -559,8 +560,7 @@ CertBlocklist::IsCertRevoked(const uint8_t* aIssuer,
     return NS_OK;
   }
 
-  nsCOMPtr<nsICryptoHash> crypto;
-  crypto = do_CreateInstance(NS_CRYPTO_HASH_CONTRACTID, &rv);
+  nsCOMPtr<nsICryptoHash> crypto = new nsCryptoHash();
 
   rv = crypto->Init(nsICryptoHash::SHA256);
   if (NS_FAILED(rv)) {

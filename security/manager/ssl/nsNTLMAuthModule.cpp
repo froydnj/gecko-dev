@@ -21,6 +21,7 @@
 #include "mozilla/Telemetry.h"
 #include "nsCOMPtr.h"
 #include "nsComponentManagerUtils.h"
+#include "nsCryptoHash.h"
 #include "nsICryptoHMAC.h"
 #include "nsICryptoHash.h"
 #include "nsIKeyModule.h"
@@ -815,10 +816,9 @@ GenerateType3Msg(const nsString &domain,
     PK11_GenerateRandom(lmResp, NTLM_CHAL_LEN);
     memset(lmResp + NTLM_CHAL_LEN, 0, LM_RESP_LEN - NTLM_CHAL_LEN);
 
-    nsCOMPtr<nsICryptoHash> hasher =
-        do_CreateInstance(NS_CRYPTO_HASH_CONTRACTID, &rv);
-    if (NS_FAILED(rv)) {
-      return rv;
+    nsCOMPtr<nsICryptoHash> hasher = new nsCryptoHash();
+    if (!hasher) {
+      return NS_ERROR_FAILURE;
     }
     rv = hasher->Init(nsICryptoHash::MD5);
     if (NS_FAILED(rv)) {
