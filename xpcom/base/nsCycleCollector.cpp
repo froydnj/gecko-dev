@@ -1688,7 +1688,7 @@ private:
     // here because OpenTempFile uses an in/out param and getter_AddRefs
     // wouldn't work.
     nsIFile* logFile = nullptr;
-    if (char* env = PR_GetEnv("MOZ_CC_LOG_DIRECTORY")) {
+    if (char* env = PR_GetEnv("MOZ_UPLOAD_DIR")) {
       NS_NewNativeLocalFile(nsCString(env), /* followLinks = */ true,
                             &logFile);
     }
