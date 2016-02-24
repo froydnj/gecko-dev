@@ -837,6 +837,7 @@ struct JSRuntime : public js::MallocProvider<JSRuntime>
      * the caller must ensure that no deadlock possible during OOM reporting.
      */
     void updateMallocCounter(size_t nbytes);
+    int32_t getMallocBytes();
 
     void reportAllocationOverflow() { js::ReportAllocationOverflow(nullptr); }
 
