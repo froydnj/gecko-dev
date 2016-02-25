@@ -192,6 +192,8 @@ public:
 
 // ---------------------------------------------------------------------------
 
+static const size_t kRecordRefcountsSize = size_t(1) << 20; // 1MB
+
 void
 nsStringBuffer::AddRef()
 {
@@ -212,7 +214,9 @@ nsStringBuffer::AddRef()
 #endif
     ;
   STRING_STAT_INCREMENT(Share);
-  NS_LOG_ADDREF(this, count, "nsStringBuffer", sizeof(*this));
+  if (mStorageSize >= kRecordRefcountsSize) {
+    NS_LOG_ADDREF(this, count, "nsStringBuffer", sizeof(*this));
+  }
 }
 
 void
@@ -225,7 +229,9 @@ nsStringBuffer::Release()
   // to the thread that destroys the object when it reads mValue with
   // acquire semantics.
   uint32_t count = mRefCount.fetch_sub(1, std::memory_order_release) - 1;
-  NS_LOG_RELEASE(this, count, "nsStringBuffer");
+  if (mStorageSize >= kRecordRefcountsSize) {
+    NS_LOG_RELEASE(this, count, "nsStringBuffer");
+  }
   if (count == 0) {
     // We're going to destroy the object on this thread, so we need
     // acquire semantics to synchronize with the memory released by
@@ -262,7 +268,9 @@ nsStringBuffer::Alloc(size_t aSize)
 #ifdef STRING_BUFFER_CANARY
     hdr->mCanary = CANARY_OK;
 #endif
-    NS_LOG_ADDREF(hdr, 1, "nsStringBuffer", sizeof(*hdr));
+    if (hdr->mStorageSize >= kRecordRefcountsSize) {
+      NS_LOG_ADDREF(hdr, 1, "nsStringBuffer", sizeof(*hdr));
+    }
   }
   return dont_AddRef(hdr);
 }
@@ -284,11 +292,15 @@ nsStringBuffer::Realloc(nsStringBuffer* aHdr, size_t aSize)
   // Treat this as a release and addref for refcounting purposes, since we
   // just asserted that the refcount is 1.  If we don't do that, refcount
   // logging will claim we've leaked all sorts of stuff.
-  NS_LOG_RELEASE(aHdr, 0, "nsStringBuffer");
+  if (aHdr->mStorageSize >= kRecordRefcountsSize) {
+    NS_LOG_RELEASE(aHdr, 0, "nsStringBuffer");
+  }
 
   aHdr = (nsStringBuffer*)realloc(aHdr, sizeof(nsStringBuffer) + aSize);
   if (aHdr) {
-    NS_LOG_ADDREF(aHdr, 1, "nsStringBuffer", sizeof(*aHdr));
+    if (aSize >= kRecordRefcountsSize) {
+      NS_LOG_ADDREF(aHdr, 1, "nsStringBuffer", sizeof(*aHdr));
+    }
     aHdr->mStorageSize = aSize;
   }
 
