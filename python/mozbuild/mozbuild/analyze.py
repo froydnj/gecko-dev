@@ -178,7 +178,7 @@ def get_install_manifests(topobjdir):
     for f in sorted(os.listdir(man_dir)):
         full = mozpath.join(man_dir, f)
 
-        if f == 'tests':
+        if f == '_tests':
             yield (j(topobjdir, '_tests'), InstallManifest(path=full))
         elif f == 'xpidl':
             yield (j(topobjdir, 'config/makefiles/xpidl'), InstallManifest(path=full))
