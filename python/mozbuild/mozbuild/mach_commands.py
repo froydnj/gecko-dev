@@ -373,7 +373,7 @@ class DependenciesProvider(MachCommandBase):
     @CommandArgument('path',
         help='Find targets that depend on a certain file')
     def targets(self, path, source=False):
-        path = self._resolve_path(path)
+        path = self._resolve_dep_file(path)
         if not path:
             print('specified path does not exist: %s' % path)
             return 1
