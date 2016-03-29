@@ -352,19 +352,92 @@ class DependenciesProvider(MachCommandBase):
     @CommandArgument('obj_file',
         help='Object file')
     def how_did_i_include(self, include_file, obj_file):
-        path = self._resolve_path(include_file)
+        path = self._resolve_dep_file(include_file)
         if not path:
             print('specified path does not exist: %s' % include_file)
             return 1
 
+        obj_file = self._resolve_dep_file(obj_file)
+
         obj_dir = os.path.dirname(obj_file)
         obj_base = os.path.basename(obj_file)
 
-        # cd obj_dir
-        # invoke make -B -n | tail -n 1
-        # add -fsyntax-only -H to the command line
-        # run that command
-        # capture stderr
+        compile_db_path = mozpath.join(self.topobjdir, 'compile_commands.json')
+        if not os.path.exists(compile_db_path):
+            print('please execute |mach build-backend -b CompileDB| before '
+                  'using this command')
+            return 1
+
+        compile_command = None
+        with open(compile_db_path, 'r') as cdb:
+            cdb_json = json.load(cdb)
+            for entry in cdb_json:
+                if entry['directory'] == obj_dir and \
+                   entry['file'] == obj_base:
+                    compile_command = entry['command']
+                    break
+
+        if not compile_command:
+            print('could not locate CompileDB entry for %s' % obj_file)
+            return 1
+
+        # Append our extract-includes-from-the-compiler arguments.
+        import shlex
+        command_args = shlex.split(compile_command)
+        command_args.append('-fsyntax-only')
+        command_args.append('-H')
+
+        # Extract output.
+        compile_process = subprocess.Popen(command_args,
+                                           cwd=obj_dir,
+                                           stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE)
+        (out, err) = compile_process.communicate()
+
+        print(err)
+
+        # Process stderr, which is where -H output gets sent.
+        import re
+        include_stack = []
+        output_re = re.compile(r'^(\.+) (.*)')
+        for line in err.split('\n'):
+            if not line:
+                continue
+
+            m = output_re.search(line)
+            # It is possible for this regex to not match, since the end
+            # of the output can look like:
+            #
+            # Multiple include guards may be useful for:
+            # $FILE1
+            # $FILE2
+            # etc.
+            if not m:
+                break
+            depth = len(m.group(1)) - 1
+            included_file = m.group(2)
+
+            if depth == len(include_stack):
+                include_stack.append(included_file)
+            elif depth > len(include_stack):
+                assert depth == len(include_stack) + 1
+                include_stack[-1] = included_file
+            else:
+                # Unwind the stack, if necessary.
+                while depth < len(include_stack):
+                    include_stack.pop()
+                include_stack.append(included_file)
+
+            assert len(m.group(1)) == len(include_stack)
+
+            if path == included_file:
+                print('Include stack:')
+                for f in include_stack:
+                    print('  %s' % f)
+                return 0
+
+        print('%s was not included by %s!' % (include_file, obj_file))
+        return 1
         
     @SubCommand('dependencies', 'targets',
         description='Print targets having a dependency.')
