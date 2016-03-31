@@ -176,7 +176,7 @@ int NrIceResolver::resolve(nr_resolver_resource *resource,
       ABORT(R_BAD_ARGS);
   }
 
-  if (NS_FAILED(dns_->AsyncResolveNative(nsAutoCString(resource->domain_name),
+  if (NS_FAILED(dns_->AsyncResolveNative(nsDependentCString(resource->domain_name),
                                          resolve_flags, pr,
                                          sts_thread_, attrs,
                                          getter_AddRefs(pr->request_)))) {
