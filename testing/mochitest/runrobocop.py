@@ -462,7 +462,7 @@ class RobocopTestRunner(MochitestDesktop):
             if result != 0 or log_result != 0:
                 # Display remote diagnostics; if running in mach, keep output
                 # terse.
-                if self.options.log_mach is None:
+                if True:
                     self.printDeviceInfo(printLogcat=True)
         except Exception:
             self.log.error(
