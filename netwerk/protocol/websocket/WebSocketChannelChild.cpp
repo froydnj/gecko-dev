@@ -151,17 +151,6 @@ private:
   nsAutoPtr<ChannelEvent> mChannelEvent;
 };
 
-void
-WebSocketChannelChild::DispatchToTargetThread(ChannelEvent *aChannelEvent)
-{
-  MOZ_RELEASE_ASSERT(NS_IsMainThread());
-  MOZ_RELEASE_ASSERT(mTargetThread);
-  MOZ_RELEASE_ASSERT(aChannelEvent);
-
-  mTargetThread->Dispatch(new WrappedChannelEvent(aChannelEvent),
-                          NS_DISPATCH_NORMAL);
-}
-
 class EventTargetDispatcher : public ChannelEvent
 {
 public:
