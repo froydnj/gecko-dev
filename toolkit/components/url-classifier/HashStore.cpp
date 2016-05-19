@@ -855,16 +855,16 @@ ByteSliceRead(nsIInputStream* aInStream, FallibleTArray<uint32_t>* aData, uint32
   rv = ReadTArray(aInStream, &slice4, count);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  if (!aData->SetCapacity(count, fallible)) {
+  uint32_t* data = aData->AppendElements(count, fallible);
+  if (!data) {
     return NS_ERROR_OUT_OF_MEMORY;
   }
 
   for (uint32_t i = 0; i < count; i++) {
-    aData->AppendElement((slice1[i] << 24) |
-                           (slice2[i] << 16) |
-                           (slice3[i] << 8) |
-                           (slice4[i]),
-                         fallible);
+    data[i] = (slice1[i] << 24) |
+      (slice2[i] << 16) |
+      (slice3[i] << 8) |
+      (slice4[i]);
   }
 
   return NS_OK;
@@ -879,13 +879,13 @@ HashStore::ReadAddPrefixes()
   nsresult rv = ByteSliceRead(mInputStream, &chunks, count);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  if (!mAddPrefixes.SetCapacity(count, fallible)) {
+  AddPrefix* prefixes = mAddPrefixes.AppendElements(count, fallible);
+  if (!prefixes) {
     return NS_ERROR_OUT_OF_MEMORY;
   }
   for (uint32_t i = 0; i < count; i++) {
-    AddPrefix *add = mAddPrefixes.AppendElement(fallible);
-    add->prefix.FromUint32(0);
-    add->addChunk = chunks[i];
+    prefixes[i].prefix.FromUint32(0);
+    prefixes[i].addChunk = chunks[i];
   }
 
   return NS_OK;
@@ -908,14 +908,14 @@ HashStore::ReadSubPrefixes()
   rv = ByteSliceRead(mInputStream, &prefixes, count);
   NS_ENSURE_SUCCESS(rv, rv);
 
-  if (!mSubPrefixes.SetCapacity(count, fallible)) {
+  SubPrefix* subPrefixes = mSubPrefixes.AppendElements(count, fallible);
+  if (!subPrefixes) {
     return NS_ERROR_OUT_OF_MEMORY;
   }
   for (uint32_t i = 0; i < count; i++) {
-    SubPrefix *sub = mSubPrefixes.AppendElement(fallible);
-    sub->addChunk = addchunks[i];
-    sub->prefix.FromUint32(prefixes[i]);
-    sub->subChunk = subchunks[i];
+    subPrefixes[i].addChunk = addchunks[i];
+    subPrefixes[i].prefix.FromUint32(prefixes[i]);
+    subPrefixes[i].subChunk = subchunks[i];
   }
 
   return NS_OK;
@@ -927,12 +927,13 @@ HashStore::WriteAddPrefixes(nsIOutputStream* aOut)
 {
   nsTArray<uint32_t> chunks;
   uint32_t count = mAddPrefixes.Length();
-  if (!chunks.SetCapacity(count, fallible)) {
+  uint32_t* chunkPtr = chunks.AppendElements(count, fallible);
+  if (!chunkPtr) {
     return NS_ERROR_OUT_OF_MEMORY;
   }
 
   for (uint32_t i = 0; i < count; i++) {
-    chunks.AppendElement(mAddPrefixes[i].Chunk());
+    chunkPtr[i] = mAddPrefixes[i].Chunk();
   }
 
   nsresult rv = ByteSliceWrite(aOut, chunks);
