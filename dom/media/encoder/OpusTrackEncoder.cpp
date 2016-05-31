@@ -8,7 +8,7 @@
 #include "mozilla/CheckedInt.h"
 #include "VideoUtils.h"
 
-#include "mozilla/Endian.h"
+#include "mozilla/EndianUtils.h"
 #include "mozilla/TypeTraits.h"
 
 #include <opus/opus.h>
