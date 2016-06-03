@@ -28,6 +28,48 @@
 #define __STDC_CONSTANT_MACROS
 #define __STDC_FORMAT_MACROS
 
+/*
+ * Some standard library headers (notably bionic on Android) declare standard
+ * functions (e.g. getchar()) and also #define macros for those standard
+ * functions.  libc++ deals with this by doing something like the following
+ * (explanatory comments added):
+ *
+ *   #ifdef FUNC
+ *   // Capture the definition of FUNC.
+ *   inline _LIBCPP_INLINE_VISIBILITY int __libcpp_FUNC(...) { return FUNC(...); }
+ *   #undef FUNC
+ *   // Use a real inline definition.
+ *   inline _LIBCPP_INLINE_VISIBILITY int FUNC(...) { return _libcpp_FUNC(...); }
+ *   #endif
+ *
+ * _LIBCPP_INLINE_VISIBILITY is typically defined as:
+ *
+ *   __attribute__((__visibility__("hidden"), __always_inline__))
+ *
+ * Unfortunately, this interacts badly with our system header wrappers, as the:
+ *
+ *   #pragma GCC visibility push(default)
+ *
+ * that they do prior to including the actual system header is treated by the
+ * compiler as an explicit declaration of visibility on every function declared
+ * in the header.  Therefore, when the libc++ code above is encountered, it is
+ * as though the compiler has effectively seen:
+ *
+ *   int FUNC(...) __attribute__((__visibility__("default")));
+ *   int FUNC(...) __attribute__((__visibility__("hidden")));
+ *
+ * and the compiler complains about the mismatched visibility declarations.
+ *
+ * However, libc++ will only define _LIBCPP_INLINE_VISIBILITY if there is no
+ * existing definition.  We can therefore define it ourselves to the empty
+ * string (since we are properly managing visibility ourselves) and avoid this
+ * whole mess.
+ */
+#if defined(__clang__) && defined(__ANDROID__)
+#define _LIBCPP_INLINE_VISIBILITY
+#define _LIBCPP_INLINE_VISIBILITY_EXCEPT_GCC49
+#endif
+
 /* Also define a char16_t type if not provided by the compiler. */
 #include "mozilla/Char16.h"
 
