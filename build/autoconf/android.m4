@@ -27,12 +27,15 @@ case "$target" in
 *-android*|*-linuxandroid*)
     AC_MSG_CHECKING([for android platform directory])
 
+    llvm_target=unknown
     case "$target_cpu" in
     arm)
         target_name=arm
+	llvm_target=armv5te-none-linux-android-eabi
         ;;
     i?86)
         target_name=x86
+	llvm_target=i686-linux-android
         ;;
     mipsel)
         target_name=mips
@@ -47,6 +50,23 @@ case "$target" in
         AC_MSG_ERROR([not found. Please check your NDK. With the current configuration, it should be in $android_platform])
     fi
 
+    AC_MSG_CHECKING([echo have clang "x$CLANG_CC"])
+    if test "$CC_TYPE" = "clang"; then
+        extra_opts="--target=${llvm_target} -gcc-toolchain $(dirname $(dirname $TOOLCHAIN_PREFIX))"
+        CFLAGS="$extra_opts $CFLAGS"
+        CXXFLAGS="$extra_opts $CXXFLAGS"
+    fi
+
+    # -idirafter does not work correctly with llvm; the default #include search
+    # paths actually include host paths outside of the NDK (!), so using -idirafter
+    # insert the android platform's /usr/include after the host's /usr/include,
+    # which obviously doesn't work that well.  Using -I appears to put things in
+    # the correct place.
+    if test "$CC_TYPE" != "clang"; then
+        CPPFLAGS="-idirafter $android_platform/usr/include $CPPFLAGS"
+    else
+        CPPFLAGS="-isystem $android_platform/usr/include $CPPFLAGS"
+    fi
     CPPFLAGS="-idirafter $android_platform/usr/include $CPPFLAGS"
     CFLAGS="-fno-short-enums -fno-exceptions $CFLAGS"
     CXXFLAGS="-fno-short-enums -fno-exceptions $CXXFLAGS"
