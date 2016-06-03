@@ -68,7 +68,9 @@
 #include "GeckoProfiler.h"
 #include "mozilla/Mutex.h"
 #include "mozilla/Atomics.h"
+#if 0
 #include "mozilla/LinuxSignal.h"
+#endif
 #include "mozilla/TimeStamp.h"
 #include "mozilla/DebugOnly.h"
 #include "ProfileEntry.h"
@@ -435,7 +437,7 @@ void Sampler::Start() {
   // Request profiling signals.
   LOG("Request signal");
   struct sigaction sa;
-  sa.sa_sigaction = MOZ_SIGNAL_TRAMPOLINE(ProfilerSignalHandler);
+  sa.sa_sigaction = nullptr; // MOZ_SIGNAL_TRAMPOLINE(ProfilerSignalHandler);
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART | SA_SIGINFO;
   if (sigaction(SIGPROF, &sa, &old_sigprof_signal_handler_) != 0) {
