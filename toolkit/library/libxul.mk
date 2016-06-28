@@ -52,6 +52,8 @@ endif
 endif
 endif
 
+OS_LDFLAGS += -Wl,--gc-sections
+
 ifdef _MSC_VER
 get_first_and_last = dumpbin -exports $1 | grep _NSModule@@ | sort -k 3 | sed -n 's/^.*?\([^@]*\)@@.*$$/\1/;1p;$$p'
 else
