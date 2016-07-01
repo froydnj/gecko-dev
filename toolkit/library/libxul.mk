@@ -16,6 +16,7 @@ LIBXUL_AUTOLOAD_FLAGS := -Dtopsrcdir=$(abspath $(topsrcdir))
 endif
 
 OS_LDFLAGS += -Wl,--gc-sections
+OS_LDFLAGS += -Wl,--icf=safe
 
 ifdef _MSC_VER
 get_first_and_last = dumpbin -exports $1 | grep _NSModule@@ | sort -k 3 | sed -n 's/^.*?\([^@]*\)@@.*$$/\1/;1p;$$p'
