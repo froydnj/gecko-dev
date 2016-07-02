@@ -2760,6 +2760,8 @@ toolbar#nav-bar {
                 'symbols_path': options.symbolsPath,
                 'socket_timeout': options.marionette_socket_timeout,
                 'startup_timeout': options.marionette_startup_timeout,
+                'gecko_log': '/opt/build/froydnj/build-debug/gecko.log',
+                'verbose': 2,
             }
 
             if options.marionette:
