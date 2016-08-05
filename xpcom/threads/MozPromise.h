@@ -1000,7 +1000,7 @@ public:
     if (!IsPending()) {
       ForwardTo(chainedPromise);
     } else {
-      mChainedPromises.AppendElement(chainedPromise);
+      mChainedPromises.AppendElement(chainedPromise.forget());
     }
   }
 
