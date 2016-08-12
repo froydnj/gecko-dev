@@ -366,7 +366,7 @@ nsXMLContentSerializer::AppendDoctype(DocumentType* aDocType,
   char16_t quote;
   if (!publicId.IsEmpty()) {
     NS_ENSURE_TRUE(AppendToString(NS_LITERAL_STRING(" PUBLIC "), aStr), NS_ERROR_OUT_OF_MEMORY);
-    if (publicId.FindChar(char16_t('"')) == -1) {
+    if (publicId.Contains(char16_t('"'))) {
       quote = char16_t('"');
     }
     else {
@@ -378,7 +378,7 @@ nsXMLContentSerializer::AppendDoctype(DocumentType* aDocType,
 
     if (!systemId.IsEmpty()) {
       NS_ENSURE_TRUE(AppendToString(char16_t(' '), aStr), NS_ERROR_OUT_OF_MEMORY);
-      if (systemId.FindChar(char16_t('"')) == -1) {
+      if (systemId.Contains(char16_t('"'))) {
         quote = char16_t('"');
       }
       else {
@@ -390,7 +390,7 @@ nsXMLContentSerializer::AppendDoctype(DocumentType* aDocType,
     }
   }
   else if (!systemId.IsEmpty()) {
-    if (systemId.FindChar(char16_t('"')) == -1) {
+    if (systemId.Contains(char16_t('"'))) {
       quote = char16_t('"');
     }
     else {

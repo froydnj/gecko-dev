@@ -1339,7 +1339,7 @@ WebSocket::ConstructorCommon(const GlobalObject& aGlobal,
       aRv.Throw(NS_ERROR_DOM_SYNTAX_ERR);
       return nullptr;
     }
-    if (protocolElement.FindChar(',') != -1)  /* interferes w/list */ {
+    if (protocolElement.Contains(','))  /* interferes w/list */ {
       aRv.Throw(NS_ERROR_DOM_SYNTAX_ERR);
       return nullptr;
     }

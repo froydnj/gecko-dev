@@ -111,7 +111,7 @@ void ProcessLengthValue(const nsAString* aInputString,
   aOutputString.Truncate();
   if (aInputString) {
     aOutputString.Append(*aInputString);
-    if (-1 == aOutputString.FindChar(char16_t('%'))) {
+    if (!aOutputString.Contains(char16_t('%'))) {
       aOutputString.AppendLiteral("px");
     }
   }

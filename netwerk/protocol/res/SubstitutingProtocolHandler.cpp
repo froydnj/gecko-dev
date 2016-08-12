@@ -436,7 +436,7 @@ SubstitutingProtocolHandler::ResolveURI(nsIURI *uri, nsACString &result)
 
   // Unescape the path so we can perform some checks on it.
   NS_UnescapeURL(pathname);
-  if (pathname.FindChar('\\') != -1) {
+  if (pathname.Contains('\\')) {
     return NS_ERROR_MALFORMED_URI;
   }
 

@@ -132,7 +132,7 @@ struct FontFamilyName final {
         // should only be passed a single font - not entirely correct, a family
         // *could* have a comma in it but in practice never does so
         // for debug purposes this is fine
-        NS_ASSERTION(aFamilyOrGenericName.FindChar(',') == -1,
+        NS_ASSERTION(!aFamilyOrGenericName.Contains(','),
                      "Convert method should only be passed a single family name");
 
         FontFamilyType genericType = eFamily_none;

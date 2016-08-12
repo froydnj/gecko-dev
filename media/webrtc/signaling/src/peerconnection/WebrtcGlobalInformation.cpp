@@ -992,7 +992,7 @@ static uint32_t GetCandidateIpAndTransportMask(const RTCIceCandidateStats *cand)
     res |= CANDIDATE_BITMASK_TCP;
   }
 
-  if (cand->mIpAddress.Value().FindChar(':') != -1) {
+  if (cand->mIpAddress.Value().Contains(':')) {
     res |= CANDIDATE_BITMASK_IPV6;
   }
 

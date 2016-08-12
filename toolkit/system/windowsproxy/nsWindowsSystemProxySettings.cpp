@@ -238,7 +238,7 @@ nsWindowsSystemProxySettings::GetProxyForURI(const nsACString & aSpec,
         if (delimiter != start) {
             const nsAutoCString proxy(Substring(cbuf, start,
                                                 delimiter - start));
-            if (proxy.FindChar('=') == -1) {
+            if (!proxy.Contains('=')) {
                 // If a proxy name is listed by itself, it is used as the
                 // default proxy for any protocols that do not have a specific
                 // proxy specified.

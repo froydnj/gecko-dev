@@ -704,7 +704,7 @@ UpgradeHostToOriginAndInsert(const nsACString& aHost, const nsCString& aType,
 
     // If this is an ipv6 URI, we need to surround it in '[', ']' before trying to
     // parse it as a URI.
-    if (aHost.FindChar(':') != -1) {
+    if (aHost.Contains(':')) {
       hostSegment.AssignLiteral("[");
       hostSegment.Append(aHost);
       hostSegment.AppendLiteral("]");

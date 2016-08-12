@@ -6807,7 +6807,7 @@ nsContentUtils::PlatformToDOMLineBreaks(nsString &aString)
 bool
 nsContentUtils::PlatformToDOMLineBreaks(nsString& aString, const fallible_t& aFallible)
 {
-  if (aString.FindChar(char16_t('\r')) != -1) {
+  if (aString.Contains(char16_t('\r'))) {
     // Windows linebreaks: Map CRLF to LF:
     if (!aString.ReplaceSubstring(u"\r\n", u"\n", aFallible)) {
       return false;
@@ -7665,7 +7665,7 @@ nsContentUtils::GetHostOrIPv6WithBrackets(nsIURI* aURI, nsCString& aHost)
     return rv;
   }
 
-  if (aHost.FindChar(':') != -1) { // Escape IPv6 address
+  if (aHost.Contains(':')) { // Escape IPv6 address
     MOZ_ASSERT(!aHost.Length() ||
       (aHost[0] !='[' && aHost[aHost.Length() - 1] != ']'));
     aHost.Insert('[', 0);

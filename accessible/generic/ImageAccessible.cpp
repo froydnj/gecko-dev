@@ -184,8 +184,7 @@ ImageAccessible::GetLongDescURI() const
     // To check if longdesc contains an invalid url.
     nsAutoString longdesc;
     mContent->AsElement()->GetAttr(kNameSpaceID_None, nsGkAtoms::longdesc, longdesc);
-    if (longdesc.FindChar(' ') != -1 || longdesc.FindChar('\t') != -1 ||
-        longdesc.FindChar('\r') != -1 || longdesc.FindChar('\n') != -1) {
+    if (longdesc.FindCharInSet(" \t\r\n") != -1) {
       return nullptr;
     }
     nsCOMPtr<nsIURI> baseURI = mContent->GetBaseURI();
