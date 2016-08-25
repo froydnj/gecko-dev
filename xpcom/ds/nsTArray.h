@@ -956,8 +956,10 @@ public:
     }
 
     // XXX std::equal would be as fast or faster here
+    const E* elems = Elements();
+    const E* otherElems = aOther.Elements();
     for (index_type i = 0; i < len; ++i) {
-      if (!(operator[](i) == aOther[i])) {
+      if (!(elems[i] == otherElems[i])) {
         return false;
       }
     }
@@ -2311,9 +2313,8 @@ ImplCycleCollectionTraverse(nsCycleCollectionTraversalCallback& aCallback,
                             uint32_t aFlags = 0)
 {
   aFlags |= CycleCollectionEdgeNameArrayFlag;
-  size_t length = aField.Length();
-  for (size_t i = 0; i < length; ++i) {
-    ImplCycleCollectionTraverse(aCallback, aField[i], aName, aFlags);
+  for (auto& elem : aField) {
+    ImplCycleCollectionTraverse(aCallback, elem, aName, aFlags);
   }
 }
 
