@@ -136,7 +136,7 @@ AsyncStatement::initialize(Connection *aDBConnection,
   aSQLStatement.BeginReading(start);
   aSQLStatement.EndReading(end);
   e = end;
-  while (::FindInReadable(NS_LITERAL_CSTRING(" LIKE"), start, e, c)) {
+  while (::CaseInsensitiveFindInReadable(NS_LITERAL_CSTRING(" LIKE"), start, e)) {
     // We have a LIKE in here, so we perform our tests
     // FindInReadable moves the iterator, so we have to get a new one for
     // each test we perform.
