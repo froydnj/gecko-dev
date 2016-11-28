@@ -216,11 +216,11 @@ HOST_CXX_LDFLAGS = $(COMPUTED_HOST_CXX_LDFLAGS)
 # We only add color flags if neither the flag to disable color
 # (e.g. "-fno-color-diagnostics" nor a flag to control color
 # (e.g. "-fcolor-diagnostics=never") is present.
-define colorize_flags
-ifeq (,$(filter $(COLOR_CFLAGS:-f%=-fno-%),$$(1))$(findstring $(COLOR_CFLAGS),$$(1)))
-$(1) += $(COLOR_CFLAGS)
-endif
-endef
+#define colorize_flags
+#ifeq (,$(filter $(COLOR_CFLAGS:-f%=-fno-%),$$(1))$(findstring $(COLOR_CFLAGS),$$(1)))
+#$(1) += $(COLOR_CFLAGS)
+#endif
+#endef
 
 color_flags_vars := \
   COMPILE_CFLAGS \
