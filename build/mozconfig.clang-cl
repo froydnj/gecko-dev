@@ -7,3 +7,5 @@ fi
 
 export CC=clang-cl
 export CXX=clang-cl
+
+ac_add_options --enable-warnings-as-errors
