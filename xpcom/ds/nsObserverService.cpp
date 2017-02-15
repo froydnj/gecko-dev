@@ -164,6 +164,38 @@ nsObserverService::Shutdown()
 
   mShuttingDown = true;
 
+#ifdef NS_FREE_PERMANENT_DATA
+  // Check for people who leak strong references.  We don't check for
+  // weak references, as those should be removed automatically if the
+  // observer service is the last one holding the reference to them.
+  for (auto iter = mObserverTopicTable.Iter(); !iter.Done(); iter.Next()) {
+    nsObserverList* list = iter.Get();
+    if (!list) {
+      continue;
+    }
+
+    nsTArray<nsCOMPtr<nsIObserver>> strongObservers;
+    list->ForgetStrongObservers(strongObservers);
+
+    // Release all the strong references manually to get back the refcount
+    // of the object.  If it's zero, the observer service was holding the
+    // last reference to the object and somebody is not cleaning things
+    // up properly.
+    for (size_t i = 0, len = strongObservers.Length(); i < len; ++i) {
+      nsIObserver* rawObserver = strongObservers[i].forget().take();
+      MozRefCountType refcount = rawObserver->Release();
+      if (refcount == 0) {
+        continue;
+      }
+
+      // We leaked!
+      nsPrintfCString msg("%s topic holding last strong reference to observer",
+                          list->GetKey());
+      NS_ASSERTION(false, msg.get());
+    }
+  }
+#endif
+
   mObserverTopicTable.Clear();
 }
 

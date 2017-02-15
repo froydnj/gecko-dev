@@ -101,6 +101,26 @@ nsObserverList::AppendStrongObservers(nsCOMArray<nsIObserver>& aArray)
 }
 
 void
+nsObserverList::ForgetStrongObservers(nsTArray<nsCOMPtr<nsIObserver>>& aArray)
+{
+  for (int32_t i = mObservers.Length() - 1; i >= 0; --i) {
+    if (!mObservers[i].isWeakRef) {
+      aArray.AppendElement(mObservers[i].forgetObserver());
+    }
+  }
+
+  // Transfer weak observers to a new array and use that.
+  nsTArray<ObserverRef> weakObservers;
+  for (int32_t i = mObservers.Length() - 1; i >= 0; --i) {
+    if (mObservers[i].isWeakRef) {
+      weakObservers.AppendElement(mObservers[i]);
+    }
+  }
+
+  mObservers.SwapElements(weakObservers);
+}
+
+void
 nsObserverList::NotifyObservers(nsISupports* aSubject,
                                 const char* aTopic,
                                 const char16_t* someData)

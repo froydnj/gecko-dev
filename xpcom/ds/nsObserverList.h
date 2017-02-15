@@ -38,6 +38,12 @@ struct ObserverRef
     return static_cast<nsIWeakReference*>((nsISupports*)ref);
   }
 
+  already_AddRefed<nsIObserver> forgetObserver()
+  {
+    NS_ASSERTION(!isWeakRef, "Isn't a strong ref.");
+    return ref.forget().downcast<nsIObserver>();
+  }
+
   bool operator==(nsISupports* aRhs) const { return ref == aRhs; }
 };
 
@@ -72,6 +78,10 @@ public:
   void AppendStrongObservers(nsCOMArray<nsIObserver>& aArray);
 
 private:
+  // Like AppendStrongObservers(), but transfers the references to the
+  // provided array.
+  void ForgetStrongObservers(nsTArray<nsCOMPtr<nsIObserver>>& aArray)
+;
   nsTArray<ObserverRef> mObservers;
 };
 
