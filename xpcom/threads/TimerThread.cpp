@@ -369,6 +369,15 @@ TimerThread::Shutdown()
 
   mThread->Shutdown();    // wait for the thread to die
 
+  nsCOMPtr<nsIObserverService> observerService =
+    mozilla::services::GetObserverService();
+  if (observerService) {
+    observerService->RemoveObserver(this, "sleep_notification");
+    observerService->RemoveObserver(this, "wake_notification");
+    observerService->RemoveObserver(this, "suspend_process_notification");
+    observerService->RemoveObserver(this, "resume_process_notification");
+  }
+
   nsTimerEvent::Shutdown();
 
   MOZ_LOG(GetTimerLog(), LogLevel::Debug, ("TimerThread::Shutdown end\n"));
