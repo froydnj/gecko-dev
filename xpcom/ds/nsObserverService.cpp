@@ -174,6 +174,13 @@ nsObserverService::Shutdown()
       continue;
     }
 
+    // XXX whitelist some things so we can actually package Firefox
+    if (strcmp(list->GetKey(), "profile-after-change") == 0 ||
+        strcmp(list->GetKey(), "profile-before-change") == 0 ||
+        strcmp(list->GetKey(), "xpcom-shutdown") == 0) {
+      continue;
+    }
+
     nsTArray<nsCOMPtr<nsIObserver>> strongObservers;
     list->ForgetStrongObservers(strongObservers);
 
