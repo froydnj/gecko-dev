@@ -811,7 +811,7 @@ void nsView::List(FILE* out, int32_t aIndent) const
     nsrefcnt widgetRefCnt = mWindow.get()->AddRef() - 1;
     mWindow.get()->Release();
     int32_t Z = mWindow->GetZIndex();
-    fprintf(out, "(widget=%p[%u] z=%d pos={%d,%d,%d,%d}) ",
+    fprintf(out, "(widget=%p[%" PRIuPTR "] z=%d pos={%d,%d,%d,%d}) ",
             (void*)mWindow, widgetRefCnt, Z,
             nonclientBounds.X(), nonclientBounds.Y(),
             windowBounds.Width(), windowBounds.Height());
