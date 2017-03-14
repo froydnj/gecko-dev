@@ -276,3 +276,44 @@ TEST(Threads, StressNSPR)
         delete [] array;
     }
 }
+
+static const size_t sIterations = 1000000;
+static const bool sTestRecursiveLock = false;
+
+TEST(Threads, MutexSpeed)
+{
+  pthread_mutex_t m = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+
+  for (size_t i = 0; i < sIterations; ++i) {
+    pthread_mutex_lock(&m);
+    if (sTestRecursiveLock) {
+      pthread_mutex_lock(&m);
+      pthread_mutex_unlock(&m);
+    }      
+    pthread_mutex_unlock(&m);
+  }
+}
+
+TEST(Threads, MMutexSpeed)
+{
+  Mutex m("test mutex");
+
+  for (size_t i = 0; i < sIterations; ++i) {
+    m.Lock();
+    m.Unlock();
+  }
+}
+
+TEST(Threads, ReentrantMonitorSpeed)
+{
+  ReentrantMonitor m("test monitor");
+
+  for (size_t i = 0; i < sIterations; ++i) {
+    m.Enter();
+    if (sTestRecursiveLock) {
+      m.Enter();
+      m.Exit();
+    }
+    m.Exit();
+  }
+}
