@@ -35,6 +35,7 @@ using namespace mozilla;
 
 static MOZ_THREAD_LOCAL(bool) sTLSIsMainThread;
 static MOZ_THREAD_LOCAL(PRThread*) gTlsCurrentVirtualThread;
+static MOZ_THREAD_LOCAL(nsThread*) sThreadSelf;
 
 bool
 NS_IsMainThreadTLSInitialized()
@@ -95,12 +96,6 @@ AssertIsOnMainThread()
 typedef nsTArray<NotNull<RefPtr<nsThread>>> nsThreadArray;
 
 //-----------------------------------------------------------------------------
-
-static void
-ReleaseObject(void* aData)
-{
-  static_cast<nsISupports*>(aData)->Release();
-}
 
 // statically allocated instance
 NS_IMETHODIMP_(MozExternalRefCountType)
@@ -236,7 +231,7 @@ nsThreadManager::Init()
 
   Scheduler::EventLoopActivation::Init();
 
-  if (PR_NewThreadPrivateIndex(&mCurThreadIndex, ReleaseObject) == PR_FAILURE) {
+  if (!sThreadSelf.init()) {
     return NS_ERROR_FAILURE;
   }
 
@@ -360,7 +355,8 @@ nsThreadManager::Shutdown()
   mMainThread = nullptr;
 
   // Remove the TLS entry for the main thread.
-  PR_SetThreadPrivate(mCurThreadIndex, nullptr);
+  sThreadSelf.get()->Release();
+  sThreadSelf.set(nullptr);
 }
 
 void
@@ -378,7 +374,7 @@ nsThreadManager::RegisterCurrentThread(nsThread& aThread)
   mThreadsByPRThread.Put(aThread.GetPRThread(), &aThread);  // XXX check OOM?
 
   aThread.AddRef();  // for TLS entry
-  PR_SetThreadPrivate(mCurThreadIndex, &aThread);
+  sThreadSelf.set(&aThread);
 }
 
 void
@@ -391,8 +387,8 @@ nsThreadManager::UnregisterCurrentThread(nsThread& aThread)
   --mCurrentNumberOfThreads;
   mThreadsByPRThread.Remove(aThread.GetPRThread());
 
-  PR_SetThreadPrivate(mCurThreadIndex, nullptr);
-  // Ref-count balanced via ReleaseObject
+  sThreadSelf.get()->Release();
+  sThreadSelf.set(nullptr);
 }
 
 nsThread*
@@ -400,7 +396,7 @@ nsThreadManager::CreateCurrentThread(SynchronizedEventQueue* aQueue,
                                      nsThread::MainThreadFlag aMainThread)
 {
   // Make sure we don't have an nsThread yet.
-  MOZ_ASSERT(!PR_GetThreadPrivate(mCurThreadIndex));
+  MOZ_ASSERT(!sThreadSelf.get());
 
   if (!mInitialized) {
     return nullptr;
@@ -419,9 +415,9 @@ nsThread*
 nsThreadManager::GetCurrentThread()
 {
   // read thread local storage
-  void* data = PR_GetThreadPrivate(mCurThreadIndex);
-  if (data) {
-    return static_cast<nsThread*>(data);
+  nsThread* self = sThreadSelf.get();
+  if (self) {
+    return self;
   }
 
   if (!mInitialized) {
@@ -442,7 +438,7 @@ nsThreadManager::GetCurrentThread()
 bool
 nsThreadManager::IsNSThread() const
 {
-  return mInitialized && !!PR_GetThreadPrivate(mCurThreadIndex);
+  return mInitialized && !!sThreadSelf.get();
 }
 
 NS_IMETHODIMP

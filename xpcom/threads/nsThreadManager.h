@@ -72,8 +72,7 @@ public:
 
 private:
   nsThreadManager()
-    : mCurThreadIndex(0)
-    , mMainPRThread(nullptr)
+    : mMainPRThread(nullptr)
     , mLock("nsThreadManager.mLock")
     , mInitialized(false)
     , mCurrentNumberOfThreads(1)
@@ -86,7 +85,6 @@ private:
                              bool aCheckingShutdown);
 
   nsRefPtrHashtable<nsPtrHashKey<PRThread>, nsThread> mThreadsByPRThread;
-  unsigned            mCurThreadIndex;  // thread-local-storage index
   RefPtr<nsThread>  mMainThread;
   PRThread*         mMainPRThread;
   mozilla::OffTheBooksMutex mLock;  // protects tables
