@@ -164,7 +164,7 @@ nsObserverService::Shutdown()
 
   mShuttingDown = true;
 
-#ifdef NS_FREE_PERMANENT_DATA
+#if 0 // defined(NS_FREE_PERMANENT_DATA)
   // Check for people who leak strong references.  We don't check for
   // weak references, as those should be removed automatically if the
   // observer service is the last one holding the reference to them.
