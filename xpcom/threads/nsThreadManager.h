@@ -38,6 +38,9 @@ public:
   // method must be called when the given thread is the current thread.
   void UnregisterCurrentThread(nsThread& aThread);
 
+  // Called by AutoThreadRegister.
+  void DeallocateTLSSlot();
+
   // Returns the current thread.  Returns null if OOM or if ThreadManager isn't
   // initialized.  Creates the nsThread if one does not exist yet.
   nsThread* GetCurrentThread();

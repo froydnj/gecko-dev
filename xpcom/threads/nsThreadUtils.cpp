@@ -8,6 +8,7 @@
 #include "mozilla/Attributes.h"
 #include "mozilla/Likely.h"
 #include "mozilla/TimeStamp.h"
+#include "mozilla/Unused.h"
 #include "LeakRefPtr.h"
 #include "nsComponentManagerUtils.h"
 #include "nsExceptionHandler.h"
@@ -644,4 +645,22 @@ nsIEventTarget::IsOnCurrentThread()
     return mVirtualThread == GetCurrentVirtualThread();
   }
   return IsOnCurrentThreadInfallible();
+}
+
+AutoThreadRegister::AutoThreadRegister()
+{
+  // We only care about this for its side-effect of registering the current
+  // thread.
+  Unused << NS_GetCurrentThread();
+}
+
+AutoThreadRegister::~AutoThreadRegister()
+{
+  // You might expect that we'd call UnregisterCurrentThread here.
+  //
+  // You would be wrong.
+  nsThreadManager& manager = nsThreadManager::get();
+  //nsThread* thread = manager.GetCurrentThread();
+  //manager.UnregisterCurrentThread(*thread);
+  manager.DeallocateTLSSlot();
 }

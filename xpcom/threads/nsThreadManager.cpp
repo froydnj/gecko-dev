@@ -696,3 +696,13 @@ GetCurrentPhysicalThread()
 }
 
 } // namespace mozilla
+
+void
+nsThreadManager::DeallocateTLSSlot()
+{
+  nsThread* self = sThreadSelf.get();
+  if (self) {
+    self->Release();
+    sThreadSelf.set(nullptr);
+  }
+}

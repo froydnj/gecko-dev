@@ -74,6 +74,27 @@ NS_NewNamedThread(const char (&aName)[LEN],
                            aResult, aInitialEvent, aStackSize);
 }
 
+namespace mozilla {
+
+/**
+ * For threads that are not started via NS_NewNamedThread or
+ * NS_NewNamedThread, their thread function should start by declaring an
+ * instance of this class.  It will take care of registering the current
+ * thread with the thread manager as well as ensuring that the current
+ * thread is unregistered with the thread manager.  The former is usually
+ * implicitly done via a call to NS_GetCurrentThread, but the latter is
+ * nearly always forgotten and can result in unexpected consequences, such
+ * as memory leaks in debug builds.
+ */
+class MOZ_RAII AutoThreadRegister final
+{
+public:
+  AutoThreadRegister();
+  ~AutoThreadRegister();
+};
+
+} // namespace mozilla
+
 /**
  * Get a reference to the current thread, creating it if it does not exist yet.
  *
