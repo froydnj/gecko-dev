@@ -55,7 +55,10 @@ LOCAL_INCLUDES += [
 ]
 
 if CONFIG['CC_TYPE'] in ('clang', 'gcc'):
-    CXXFLAGS += ['-Wno-error=shadow']
+    CXXFLAGS += [
+        '-Wno-error=shadow',
+        '-Wno-maybe-uninitialized',
+    ]
 
 if CONFIG['MOZ_DEBUG']:
     XPIDL_SOURCES += [
