@@ -131,7 +131,7 @@ class Builtin(object):
 
     def nativeType(self, calltype, shared=False, const=False):
         if const:
-            print >>sys.stderr, IDLError("[const] doesn't make sense on builtin types.", self.location, warning=True)
+            print >>sys.stderr, IDLError("[const] doesn't make sense on builtin type %s." % self.nativename, self.location, warning=True)
             const = 'const '
         elif calltype == 'in' and self.isPointer():
             const = 'const '
