@@ -32,7 +32,9 @@ def symlink(source, link_name):
 def check_run(args):
     print >> sys.stderr, ' '.join(args)
     r = subprocess.call(args)
-    assert r == 0
+    if r != 0:
+        print >> sys.stderr, 'Failed to execute', ' '.join(args)
+        assert r == 0
 
 
 def run_in(path, args):
