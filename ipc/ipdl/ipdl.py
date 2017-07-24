@@ -124,7 +124,7 @@ for f in files:
 
     if ast.protocol:
         allmessages[ast.protocol.name] = ipdl.genmsgenum(ast)
-        allprotocols.append('%sMsgStart' % ast.protocol.name)
+        allprotocols.append(ast.protocol.name)
         # e.g. PContent::RequestMemoryReport (not prefixed or suffixed.)
         for md in ast.protocol.messageDecls:
             allmessageprognames.append('%s::%s' % (md.namespace, md.decl.progname))
@@ -151,7 +151,7 @@ enum IPCMessageStart {
 """
 
 for name in allprotocols:
-    print >>ipcmsgstart, "  %s," % name
+    print >>ipcmsgstart, "  %sMsgStart," % name
 
 print >>ipcmsgstart, """
   LastMsgIndex
