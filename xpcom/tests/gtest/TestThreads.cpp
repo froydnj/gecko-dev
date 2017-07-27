@@ -280,6 +280,7 @@ TEST(Threads, StressNSPR)
 static const size_t sIterations = 1000000;
 static const bool sTestRecursiveLock = false;
 
+#ifndef ANDROID
 TEST(Threads, MutexSpeed)
 {
   pthread_mutex_t m = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
@@ -293,6 +294,7 @@ TEST(Threads, MutexSpeed)
     pthread_mutex_unlock(&m);
   }
 }
+#endif
 
 TEST(Threads, MMutexSpeed)
 {
