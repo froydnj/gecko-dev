@@ -42,6 +42,6 @@ panic = "abort"
 [profile.release]
 opt-level = 2
 rpath = false
-lto = true
+lto = false
 debug-assertions = false
 panic = "abort"
