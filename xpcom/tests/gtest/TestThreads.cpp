@@ -12,6 +12,7 @@
 #include "nsIServiceManager.h"
 #include "nsXPCOM.h"
 #include "mozilla/Monitor.h"
+#include "mozilla/ReentrantMonitor.h"
 #include "gtest/gtest.h"
 
 class nsRunner final : public nsIRunnable {
@@ -298,7 +299,7 @@ TEST(Threads, MutexSpeed)
 
 TEST(Threads, MMutexSpeed)
 {
-  Mutex m("test mutex");
+  mozilla::Mutex m("test mutex");
 
   for (size_t i = 0; i < sIterations; ++i) {
     m.Lock();
@@ -308,7 +309,7 @@ TEST(Threads, MMutexSpeed)
 
 TEST(Threads, ReentrantMonitorSpeed)
 {
-  ReentrantMonitor m("test monitor");
+  mozilla::ReentrantMonitor m("test monitor");
 
   for (size_t i = 0; i < sIterations; ++i) {
     m.Enter();
