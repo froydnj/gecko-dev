@@ -76,6 +76,7 @@ EXPORTS += [
     'nsVariant.h',
     'nsWhitespaceTokenizer.h',
     'PLDHashTable.h',
+    'QMEHashTable.h',
 ]
 
 EXPORTS.mozilla += [
@@ -115,6 +116,7 @@ UNIFIED_SOURCES += [
     'nsTObserverArray.cpp',
     'nsVariant.cpp',
     'PLDHashTable.cpp',
+    'QMEHashTable.cpp',
     'Tokenizer.cpp',
 ]
 

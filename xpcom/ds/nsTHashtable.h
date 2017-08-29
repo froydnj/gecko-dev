@@ -382,7 +382,7 @@ namespace detail {
 // rather than separate copies for every EntryType used with nsTHashtable.
 template<size_t N>
 static void
-FixedSizeEntryMover(PLDHashTable*,
+FixedSizeEntryMover(QMEHashTable*,
                     const PLDHashEntryHdr* aFrom,
                     PLDHashEntryHdr* aTo)
 {

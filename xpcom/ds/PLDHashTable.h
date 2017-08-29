@@ -18,6 +18,7 @@
 typedef uint32_t PLDHashNumber;
 
 class PLDHashTable;
+class QMEHashTable;
 struct PLDHashTableOps;
 
 // Table entry header structure.
@@ -40,6 +41,7 @@ struct PLDHashEntryHdr
 {
 private:
   friend class PLDHashTable;
+  friend class QMEHashTable;
 
   PLDHashNumber mKeyHash;
 };

@@ -10,6 +10,7 @@
 #include "nsThreadUtils.h"
 #include "nsServiceManagerUtils.h"
 #include "mozilla/Atomics.h"
+#include "nsServiceManagerUtils.h"
 #include "gtest/gtest.h"
 
 using mozilla::Atomic;
