@@ -77,6 +77,7 @@ EXPORTS.mozilla = [
     'Result.h',
     'ResultExtensions.h',
     'ReverseIterator.h',
+    'RobustOperatorEqualMove.h',
     'RollingMean.h',
     'Saturate.h',
     'Scoped.h',
