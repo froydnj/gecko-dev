@@ -8,6 +8,7 @@
 #define nsTHashtable_h__
 
 #include "PLDHashTable.h"
+#include "QMEHashTable.h"
 #include "nsPointerHashKeys.h"
 #include "mozilla/Assertions.h"
 #include "mozilla/Attributes.h"
@@ -83,7 +84,7 @@ public:
   // Separate constructors instead of default aInitLength parameter since
   // otherwise the default no-arg constructor isn't found.
   nsTHashtable()
-    : mTable(Ops(), sizeof(EntryType), PLDHashTable::kDefaultInitialLength)
+    : mTable(Ops(), sizeof(EntryType), QMEHashTable::kDefaultInitialLength)
   {}
   explicit nsTHashtable(uint32_t aInitLength)
     : mTable(Ops(), sizeof(EntryType), aInitLength)
@@ -132,7 +133,7 @@ public:
   EntryType* GetEntry(KeyType aKey) const
   {
     return static_cast<EntryType*>(
-      const_cast<PLDHashTable*>(&mTable)->Search(EntryType::KeyToPointer(aKey)));
+      const_cast<QMEHashTable*>(&mTable)->Search(EntryType::KeyToPointer(aKey)));
   }
 
   /**
@@ -241,10 +242,10 @@ public:
   //     // ... possibly call iter.Remove() once ...
   //   }
   //
-  class Iterator : public PLDHashTable::Iterator
+  class Iterator : public QMEHashTable::Iterator
   {
   public:
-    typedef PLDHashTable::Iterator Base;
+    typedef QMEHashTable::Iterator Base;
 
     explicit Iterator(nsTHashtable* aTable) : Base(&aTable->mTable) {}
     Iterator(Iterator&& aOther) : Base(aOther.mTable) {}
@@ -344,17 +345,17 @@ public:
 #endif
 
 protected:
-  PLDHashTable mTable;
+  QMEHashTable mTable;
 
   static PLDHashNumber s_HashKey(const void* aKey);
 
   static bool s_MatchEntry(const PLDHashEntryHdr* aEntry,
                            const void* aKey);
 
-  static void s_CopyEntry(PLDHashTable* aTable, const PLDHashEntryHdr* aFrom,
+  static void s_CopyEntry(QMEHashTable* aTable, const PLDHashEntryHdr* aFrom,
                           PLDHashEntryHdr* aTo);
 
-  static void s_ClearEntry(PLDHashTable* aTable, PLDHashEntryHdr* aEntry);
+  static void s_ClearEntry(QMEHashTable* aTable, PLDHashEntryHdr* aEntry);
 
   static void s_InitEntry(PLDHashEntryHdr* aEntry, const void* aKey);
 
@@ -365,7 +366,7 @@ private:
   /**
    * Gets the table's ops.
    */
-  static const PLDHashTableOps* Ops();
+  static const QMEHashTableOps* Ops();
 
   // assignment operator, not implemented
   nsTHashtable<EntryType>& operator=(nsTHashtable<EntryType>& aToEqual) = delete;
@@ -408,19 +409,19 @@ nsTHashtable<EntryType>::~nsTHashtable()
 }
 
 template<class EntryType>
-/* static */ const PLDHashTableOps*
+/* static */ const QMEHashTableOps*
 nsTHashtable<EntryType>::Ops()
 {
   // If this variable is a global variable, we get strange start-up failures on
   // WindowsCrtPatch.h (see bug 1166598 comment 20). But putting it inside a
   // function avoids that problem.
-  static const PLDHashTableOps sOps =
+  static const QMEHashTableOps sOps =
   {
     s_HashKey,
     s_MatchEntry,
     EntryType::ALLOW_MEMMOVE ? mozilla::detail::FixedSizeEntryMover<sizeof(EntryType)> : s_CopyEntry,
     s_ClearEntry,
-    s_InitEntry
+    s_InitEntry,
   };
   return &sOps;
 }
@@ -445,7 +446,7 @@ nsTHashtable<EntryType>::s_MatchEntry(const PLDHashEntryHdr* aEntry,
 
 template<class EntryType>
 void
-nsTHashtable<EntryType>::s_CopyEntry(PLDHashTable* aTable,
+nsTHashtable<EntryType>::s_CopyEntry(QMEHashTable* aTable,
                                      const PLDHashEntryHdr* aFrom,
                                      PLDHashEntryHdr* aTo)
 {
@@ -459,7 +460,7 @@ nsTHashtable<EntryType>::s_CopyEntry(PLDHashTable* aTable,
 
 template<class EntryType>
 void
-nsTHashtable<EntryType>::s_ClearEntry(PLDHashTable* aTable,
+nsTHashtable<EntryType>::s_ClearEntry(QMEHashTable* aTable,
                                       PLDHashEntryHdr* aEntry)
 {
   static_cast<EntryType*>(aEntry)->~EntryType();

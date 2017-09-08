@@ -25,6 +25,7 @@ class nsBaseHashtableET : public KeyClass
 {
 public:
   DataType mData;
+  typedef nsBaseHashtableET<KeyClass, DataType> self_type;
   friend class nsTHashtable<nsBaseHashtableET<KeyClass, DataType>>;
 
 private:
@@ -388,10 +389,10 @@ public:
   //     // ... possibly call iter.Remove() once ...
   //   }
   //
-  class Iterator : public PLDHashTable::Iterator
+  class Iterator : public QMEHashTable::Iterator
   {
   public:
-    typedef PLDHashTable::Iterator Base;
+    typedef QMEHashTable::Iterator Base;
 
     explicit Iterator(nsBaseHashtable* aTable) : Base(&aTable->mTable) {}
     Iterator(Iterator&& aOther) : Base(aOther.mTable) {}
