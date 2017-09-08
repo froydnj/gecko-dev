@@ -2,7 +2,7 @@
 
 import sys, subprocess, json, statistics
 
-proc = subprocess.Popen(["./mach", "gtest", sys.argv[1]], stdout=subprocess.PIPE)
+proc = subprocess.Popen(["mach", "gtest", sys.argv[1]], stdout=subprocess.PIPE)
 for line in proc.stdout:
     if line.startswith(b"PERFHERDER_DATA:"):
         data = json.loads(line[len("PERFHERDER_DATA:"):].decode("utf8"))
