@@ -245,7 +245,7 @@ public:
   // aren't. So we allow them to explicitly disable this strict checking.
   nsMainThreadPtrHolder(const char* aName, T* aPtr, bool aStrict = true,
                         nsIEventTarget* aMainThreadEventTarget = nullptr)
-    : mRawPtr(nullptr)
+    : mPtr(nullptr)
     , mStrict(aStrict)
     , mMainThreadEventTarget(aMainThreadEventTarget)
 #ifndef RELEASE_OR_BETA
@@ -255,12 +255,12 @@ public:
     // We can only AddRef our pointer on the main thread, which means that the
     // holder must be constructed on the main thread.
     MOZ_ASSERT(!mStrict || NS_IsMainThread());
-    NS_IF_ADDREF(mRawPtr = aPtr);
+    mPtr = aPtr;
   }
   nsMainThreadPtrHolder(const char* aName, already_AddRefed<T> aPtr,
                         bool aStrict = true,
                         nsIEventTarget* aMainThreadEventTarget = nullptr)
-    : mRawPtr(aPtr.take())
+    : mPtr(mozilla::Move(aPtr))
     , mStrict(aStrict)
     , mMainThreadEventTarget(aMainThreadEventTarget)
 #ifndef RELEASE_OR_BETA
@@ -276,8 +276,9 @@ private:
   ~nsMainThreadPtrHolder()
   {
     if (NS_IsMainThread()) {
-      NS_IF_RELEASE(mRawPtr);
-    } else if (mRawPtr) {
+      // Ensure we drop the reference on the main thread.
+      RefPtr<T> local(mozilla::Move(mPtr));
+    } else if (mPtr) {
       if (!mMainThreadEventTarget) {
         mMainThreadEventTarget = do_GetMainThread();
       }
@@ -288,7 +289,7 @@ private:
 #else
         mName,
 #endif
-        mMainThreadEventTarget, dont_AddRef(mRawPtr));
+        mMainThreadEventTarget, mPtr.forget());
     }
   }
 
@@ -300,23 +301,23 @@ public:
       NS_ERROR("Can't dereference nsMainThreadPtrHolder off main thread");
       MOZ_CRASH();
     }
-    return mRawPtr;
+    return mPtr;
   }
 
   bool operator==(const nsMainThreadPtrHolder<T>& aOther) const
   {
-    return mRawPtr == aOther.mRawPtr;
+    return mPtr == aOther.mPtr;
   }
   bool operator!() const
   {
-    return !mRawPtr;
+    return !mPtr;
   }
 
   NS_INLINE_DECL_THREADSAFE_REFCOUNTING(nsMainThreadPtrHolder<T>)
 
 private:
   // Our wrapped pointer.
-  T* mRawPtr;
+  RefPtr<T> mPtr;
 
   // Whether to strictly enforce thread invariants in this class.
   bool mStrict;
