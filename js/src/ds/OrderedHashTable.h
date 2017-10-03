@@ -755,7 +755,7 @@ class OrderedHashMap
 
         void operator=(Entry&& rhs) {
             MOZ_ASSERT(this != &rhs, "self-move assignment is prohibited");
-            const_cast<Key&>(key) = Move(rhs.key);
+            const_cast<Key&>(key) = Move(const_cast<Key&>(rhs.key));
             value = Move(rhs.value);
         }
 
@@ -763,7 +763,7 @@ class OrderedHashMap
         Entry() : key(), value() {}
         template <typename V>
         Entry(const Key& k, V&& v) : key(k), value(Forward<V>(v)) {}
-        Entry(Entry&& rhs) : key(Move(rhs.key)), value(Move(rhs.value)) {}
+        Entry(Entry&& rhs) : key(Move(const_cast<Key&>(rhs.key))), value(Move(rhs.value)) {}
 
         const Key key;
         Value value;
