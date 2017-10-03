@@ -197,7 +197,7 @@ public:
       return true;
     }
     if (aData) {
-      *aData = mozilla::Move(DataType());
+      *aData = DataType();
     }
     return false;
   }
