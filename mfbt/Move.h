@@ -200,7 +200,14 @@ template<typename T>
 inline typename RemoveReference<T>::Type&&
 Move(T&& aX)
 {
-  return static_cast<typename RemoveReference<T>::Type&&>(aX);
+  // XXX errors, errors everywhere.
+  //static_assert(IsLvalueReference<T>::value,
+  //              "T is not an lvalue reference, Move() is unnecessary.");
+
+  using BaseType = typename RemoveReference<T>::Type;
+  //static_assert(!IsConst<BaseType>::value,
+  //              "Move() with const values is nonsensical.");
+  return static_cast<BaseType&&>(aX);
 }
 
 /**
