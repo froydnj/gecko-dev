@@ -249,33 +249,25 @@ private:
 class IID2NativeInterfaceMap
 {
 public:
-    struct Entry : public PLDHashEntryHdr
-    {
-        const nsIID*        key;
-        XPCNativeInterface* value;
-
-        static const struct PLDHashTableOps sOps;
-    };
-
     static IID2NativeInterfaceMap* newMap(int length);
 
     inline XPCNativeInterface* Find(REFNSIID iid)
     {
-        auto entry = static_cast<Entry*>(mTable.Search(&iid));
-        return entry ? entry->value : nullptr;
+        XPCNativeInterface* result = nullptr;
+        mTable.Get(&iid, &result);
+        return result;
     }
 
     inline XPCNativeInterface* Add(XPCNativeInterface* iface)
     {
         MOZ_ASSERT(iface,"bad param");
         const nsIID* iid = iface->GetIID();
-        auto entry = static_cast<Entry*>(mTable.Add(iid, mozilla::fallible));
-        if (!entry)
+        auto* value = mTable.GetOrInsert(iid, mozilla::fallible);
+        if (!value)
             return nullptr;
-        if (entry->key)
-            return entry->value;
-        entry->key = iid;
-        entry->value = iface;
+        if (*value)
+            return *value;
+        *value = iface;
         return iface;
     }
 
@@ -285,9 +277,10 @@ public:
         mTable.Remove(iface->GetIID());
     }
 
-    inline uint32_t Count() { return mTable.EntryCount(); }
+    inline uint32_t Count() { return mTable.Count(); }
 
-    PLDHashTable::Iterator Iter() { return mTable.Iter(); }
+    nsDataHashtable<nsIIDPartialHashKey, XPCNativeInterface*>::Iterator
+    Iter() { return mTable.Iter(); }
 
     size_t SizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf) const;
 
@@ -296,7 +289,7 @@ private:
     explicit IID2NativeInterfaceMap(int size);
 
 private:
-    PLDHashTable mTable;
+    nsDataHashtable<nsIIDPartialHashKey, XPCNativeInterface*> mTable;
 };
 
 /*************************/

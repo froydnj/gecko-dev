@@ -146,14 +146,6 @@ IID2WrappedJSClassMap::IID2WrappedJSClassMap(int length)
 /***************************************************************************/
 // implement IID2NativeInterfaceMap...
 
-const struct PLDHashTableOps IID2NativeInterfaceMap::Entry::sOps =
-{
-    HashIIDPtrKey,
-    MatchIIDPtrKey,
-    PLDHashTable::MoveEntryStub,
-    PLDHashTable::ClearEntryStub
-};
-
 // static
 IID2NativeInterfaceMap*
 IID2NativeInterfaceMap::newMap(int length)
@@ -162,7 +154,7 @@ IID2NativeInterfaceMap::newMap(int length)
 }
 
 IID2NativeInterfaceMap::IID2NativeInterfaceMap(int length)
-  : mTable(&Entry::sOps, sizeof(Entry), length)
+  : mTable(length)
 {
 }
 
@@ -172,8 +164,8 @@ IID2NativeInterfaceMap::SizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf) 
     size_t n = mallocSizeOf(this);
     n += mTable.ShallowSizeOfExcludingThis(mallocSizeOf);
     for (auto iter = mTable.ConstIter(); !iter.Done(); iter.Next()) {
-        auto entry = static_cast<IID2NativeInterfaceMap::Entry*>(iter.Get());
-        n += entry->value->SizeOfIncludingThis(mallocSizeOf);
+        auto* iface = iter.UserData();
+        n += iface->SizeOfIncludingThis(mallocSizeOf);
     }
     return n;
 }
