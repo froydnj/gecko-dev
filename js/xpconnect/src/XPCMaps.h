@@ -13,6 +13,9 @@
 
 #include "js/GCHashTable.h"
 
+#include "nsDataHashtable.h"
+#include "nsHashKeys.h"
+
 // Maps...
 
 // Note that most of the declarations for hash table entries begin with
@@ -165,36 +168,59 @@ private:
 
 /*************************/
 
+// This differs from nsIDHashKey in that we don't copy the entire nsID into
+// the hash entry, and we only examine part of the IID to determine the hash.
+class nsIIDPartialHashKey : public PLDHashEntryHdr
+{
+public:
+    typedef const nsID* KeyType;
+    typedef const nsID* KeyTypePointer;
+
+    explicit nsIIDPartialHashKey(const nsID* aKey)
+        : mKey(aKey)
+    {}
+    nsIIDPartialHashKey(nsIIDPartialHashKey&& aOther)
+        : PLDHashEntryHdr(mozilla::Move(aOther))
+        , mKey(mozilla::Move(aOther.mKey))
+    {}
+
+    KeyType GetKey() const { return mKey; }
+    bool KeyEquals(KeyTypePointer aKey) const { return aKey->Equals(*mKey); }
+
+    static KeyTypePointer KeyToPointer(KeyType aKey) { return aKey; }
+    static PLDHashNumber HashKey(KeyTypePointer aKey)
+    {
+        return mozilla::HashGeneric(*(reinterpret_cast<const uintptr_t*>(aKey)));
+    }
+
+    enum { ALLOW_MEMMOVE = true };
+
+protected:
+    const nsID* mKey;
+};
+
 class IID2WrappedJSClassMap
 {
 public:
-    struct Entry : public PLDHashEntryHdr
-    {
-        const nsIID*         key;
-        nsXPCWrappedJSClass* value;
-
-        static const struct PLDHashTableOps sOps;
-    };
-
     static IID2WrappedJSClassMap* newMap(int length);
 
     inline nsXPCWrappedJSClass* Find(REFNSIID iid)
     {
-        auto entry = static_cast<Entry*>(mTable.Search(&iid));
-        return entry ? entry->value : nullptr;
+        nsXPCWrappedJSClass* result = nullptr;
+        mTable.Get(&iid, &result);
+        return result;
     }
 
     inline nsXPCWrappedJSClass* Add(nsXPCWrappedJSClass* clazz)
     {
         MOZ_ASSERT(clazz,"bad param");
         const nsIID* iid = &clazz->GetIID();
-        auto entry = static_cast<Entry*>(mTable.Add(iid, mozilla::fallible));
-        if (!entry)
+        auto* value = mTable.GetOrInsert(iid, mozilla::fallible);
+        if (!value)
             return nullptr;
-        if (entry->key)
-            return entry->value;
-        entry->key = iid;
-        entry->value = clazz;
+        if (*value)
+            return *value;
+        *value = clazz;
         return clazz;
     }
 
@@ -204,17 +230,18 @@ public:
         mTable.Remove(&clazz->GetIID());
     }
 
-    inline uint32_t Count() { return mTable.EntryCount(); }
+    inline uint32_t Count() { return mTable.Count(); }
 
 #ifdef DEBUG
-    PLDHashTable::Iterator Iter() { return mTable.Iter(); }
+    nsDataHashtable<nsIIDPartialHashKey, nsXPCWrappedJSClass*>::Iterator
+    Iter() { return mTable.Iter(); }
 #endif
 
 private:
     IID2WrappedJSClassMap();    // no implementation
     explicit IID2WrappedJSClassMap(int size);
 private:
-    PLDHashTable mTable;
+    nsDataHashtable<nsIIDPartialHashKey, nsXPCWrappedJSClass*> mTable;
 };
 
 /*************************/

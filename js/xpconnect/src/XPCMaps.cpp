@@ -131,14 +131,6 @@ Native2WrappedNativeMap::SizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf)
 /***************************************************************************/
 // implement IID2WrappedJSClassMap...
 
-const struct PLDHashTableOps IID2WrappedJSClassMap::Entry::sOps =
-{
-    HashIIDPtrKey,
-    MatchIIDPtrKey,
-    PLDHashTable::MoveEntryStub,
-    PLDHashTable::ClearEntryStub
-};
-
 // static
 IID2WrappedJSClassMap*
 IID2WrappedJSClassMap::newMap(int length)
@@ -147,7 +139,7 @@ IID2WrappedJSClassMap::newMap(int length)
 }
 
 IID2WrappedJSClassMap::IID2WrappedJSClassMap(int length)
-  : mTable(&Entry::sOps, sizeof(Entry), length)
+  : mTable(length)
 {
 }
 

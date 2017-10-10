@@ -2968,8 +2968,8 @@ XPCJSRuntime::DebugDump(int16_t depth)
         if (depth && mWrappedJSClassMap->Count()) {
             XPC_LOG_INDENT();
             for (auto i = mWrappedJSClassMap->Iter(); !i.Done(); i.Next()) {
-                auto entry = static_cast<IID2WrappedJSClassMap::Entry*>(i.Get());
-                entry->value->DebugDump(depth);
+                auto* value = i.UserData();
+                value->DebugDump(depth);
             }
             XPC_LOG_OUTDENT();
         }
