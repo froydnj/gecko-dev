@@ -108,11 +108,12 @@ public:
     , mKey(aOther->mKey)
   {}
 
-  KeyboardHashKey(KeyType aOther)
-    : mLang(aOther.mLang)
-    , mRegion(aOther.mRegion)
-    , mKeyIdx(aOther.mKeyIdx)
-    , mKey(aOther.mKey)
+  KeyboardHashKey(KeyboardHashKey&& aOther)
+    : PLDHashEntryHdr(mozilla::Move(aOther))
+    , mLang(Move(aOther.mLang))
+    , mRegion(Move(aOther.mRegion))
+    , mKeyIdx(Move(aOther.mKeyIdx))
+    , mKey(Move(aOther.mKey))
   {}
 
   ~KeyboardHashKey()

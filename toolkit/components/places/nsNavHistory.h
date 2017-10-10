@@ -580,8 +580,8 @@ protected:
     : nsURIHashKey(aURI)
     {
     }
-    VisitHashKey(const VisitHashKey& aOther)
-    : nsURIHashKey(aOther)
+    VisitHashKey(VisitHashKey&& aOther)
+      : nsURIHashKey(mozilla::Move(aOther))
     {
       NS_NOTREACHED("Do not call me!");
     }

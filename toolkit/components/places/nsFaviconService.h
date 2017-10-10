@@ -21,6 +21,7 @@
 #include "imgITools.h"
 #include "mozilla/storage.h"
 #include "mozilla/Attributes.h"
+#include "mozilla/Move.h"
 
 #include "FaviconHelpers.h"
 
@@ -36,11 +37,13 @@ class UnassociatedIconHashKey : public nsURIHashKey
 {
 public:
   explicit UnassociatedIconHashKey(const nsIURI* aURI)
-  : nsURIHashKey(aURI)
+    : nsURIHashKey(aURI)
   {
   }
-  UnassociatedIconHashKey(const UnassociatedIconHashKey& aOther)
-  : nsURIHashKey(aOther)
+  UnassociatedIconHashKey(UnassociatedIconHashKey&& aOther)
+    : nsURIHashKey(mozilla::Move(aOther))
+    , iconData(mozilla::Move(aOther.iconData))
+    , created(mozilla::Move(aOther.created))
   {
     NS_NOTREACHED("Do not call me!");
   }

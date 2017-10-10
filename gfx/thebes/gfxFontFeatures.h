@@ -112,7 +112,10 @@ private:
         typedef const FeatureValueHashKey *KeyTypePointer;
 
         explicit FeatureValueHashEntry(KeyTypePointer aKey) { }
-        FeatureValueHashEntry(const FeatureValueHashEntry& toCopy)
+        FeatureValueHashEntry(FeatureValueHashEntry&& other)
+            : PLDHashEntryHdr(mozilla::Move(other))
+            , mKey(mozilla::Move(other.mKey))
+            , mValues(mozilla::Move(other.mValues))
         {
             NS_ERROR("Should not be called");
         }

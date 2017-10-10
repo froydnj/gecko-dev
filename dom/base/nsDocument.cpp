@@ -383,7 +383,8 @@ nsIdentifierMapEntry::~nsIdentifierMapEntry()
 {}
 
 nsIdentifierMapEntry::nsIdentifierMapEntry(nsIdentifierMapEntry&& aOther)
-  : mKey(mozilla::Move(aOther.mKey))
+  : PLDHashEntryHdr(mozilla::Move(aOther))
+  , mKey(mozilla::Move(aOther.mKey))
   , mIdContentList(mozilla::Move(aOther.mIdContentList))
   , mNameContentList(mozilla::Move(aOther.mNameContentList))
   , mChangeCallbacks(mozilla::Move(aOther.mChangeCallbacks))

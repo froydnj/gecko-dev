@@ -1486,7 +1486,7 @@ public:
     mCanonical = canonical;
   }
 
-  // Copy constructor needs to be explicit or the linker complains.
+  // This is explicitly not a copy constructor.
   explicit PrefCallback(const PrefCallback*& aCopy)
     : mDomain(aCopy->mDomain)
     , mBranch(aCopy->mBranch)
@@ -1496,6 +1496,9 @@ public:
   {
     MOZ_COUNT_CTOR(PrefCallback);
   }
+
+  PrefCallback(const PrefCallback&) = delete;
+  PrefCallback(PrefCallback&&) = default;
 
   ~PrefCallback() { MOZ_COUNT_DTOR(PrefCallback); }
 

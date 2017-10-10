@@ -9,6 +9,7 @@
 
 #include "mozilla/IHistory.h"
 #include "mozilla/MemoryReporting.h"
+#include "mozilla/Move.h"
 #include "mozilla/Mutex.h"
 #include "mozIAsyncHistory.h"
 #include "nsIDownloadHistory.h"
@@ -213,8 +214,10 @@ private:
     : nsURIHashKey(aURI)
     {
     }
-    KeyClass(const KeyClass& aOther)
-    : nsURIHashKey(aOther)
+    KeyClass(KeyClass&& aOther)
+      : nsURIHashKey(mozilla::Move(aOther))
+      , array(mozilla::Move(aOther.array))
+      , mVisited(mozilla::Move(aOther.mVisited))
     {
       NS_NOTREACHED("Do not call me!");
     }
@@ -238,7 +241,7 @@ private:
     explicit RecentURIKey(const nsIURI* aURI) : nsURIHashKey(aURI)
     {
     }
-    RecentURIKey(const RecentURIKey& aOther) : nsURIHashKey(aOther)
+    RecentURIKey(RecentURIKey&& aOther) : nsURIHashKey(mozilla::Move(aOther))
     {
       NS_NOTREACHED("Do not call me!");
     }

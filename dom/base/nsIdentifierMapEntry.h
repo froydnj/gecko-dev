@@ -175,8 +175,9 @@ public:
 
     explicit ChangeCallbackEntry(const ChangeCallback* aKey) :
       mKey(*aKey) { }
-    ChangeCallbackEntry(const ChangeCallbackEntry& toCopy) :
-      mKey(toCopy.mKey) { }
+    ChangeCallbackEntry(ChangeCallbackEntry&& aOther) :
+      PLDHashEntryHdr(mozilla::Move(aOther)),
+      mKey(mozilla::Move(aOther.mKey)) { }
 
     KeyType GetKey() const { return mKey; }
     bool KeyEquals(KeyTypePointer aKey) const {

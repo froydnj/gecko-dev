@@ -35,7 +35,8 @@ public:
      mForceCompositing(false)
   { }
   nsSMILCompositor(nsSMILCompositor&& toMove)
-    : mKey(mozilla::Move(toMove.mKey)),
+    : PLDHashEntryHdr(mozilla::Move(toMove)),
+      mKey(mozilla::Move(toMove.mKey)),
       mAnimationFunctions(mozilla::Move(toMove.mAnimationFunctions)),
       mForceCompositing(false)
   { }

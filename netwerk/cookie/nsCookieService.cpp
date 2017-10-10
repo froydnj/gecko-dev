@@ -2863,7 +2863,7 @@ nsCookieService::Read()
 
     nsCookieKey key(baseDomain, attrs);
     CookieDomainTuple* tuple = mReadArray.AppendElement();
-    tuple->key = key;
+    tuple->key = Move(key);
     tuple->cookie = GetCookieFromRow(stmt, attrs);
   }
 

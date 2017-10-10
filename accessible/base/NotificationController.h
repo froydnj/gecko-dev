@@ -355,7 +355,10 @@ private:
     typedef const T* KeyTypePointer;
 
     explicit nsCOMPtrHashKey(const T* aKey) : mKey(const_cast<T*>(aKey)) {}
-    explicit nsCOMPtrHashKey(const nsPtrHashKey<T> &aToCopy) : mKey(aToCopy.mKey) {}
+    nsCOMPtrHashKey(nsCOMPtrHashKey<T>&& aOther)
+      : PLDHashEntryHdr(Move(aOther))
+      , mKey(Move(aOther.mKey))
+    {}
     ~nsCOMPtrHashKey() { }
 
     KeyType GetKey() const { return mKey; }

@@ -29,8 +29,10 @@ public:
                                                           mLoadResult(NS_OK)
     {
     }
-    txLoadedDocumentEntry(const txLoadedDocumentEntry& aToCopy)
-        : nsStringHashKey(aToCopy)
+    txLoadedDocumentEntry(txLoadedDocumentEntry&& aOther)
+        : nsStringHashKey(mozilla::Move(aOther))
+        , mDocument(mozilla::Move(aOther.mDocument))
+        , mLoadResult(mozilla::Move(aOther.mLoadResult))
     {
         NS_ERROR("We're horked.");
     }

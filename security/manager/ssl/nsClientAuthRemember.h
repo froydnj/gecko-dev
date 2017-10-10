@@ -65,7 +65,8 @@ class nsClientAuthRememberEntry final : public PLDHashEntryHdr
     }
 
     nsClientAuthRememberEntry(nsClientAuthRememberEntry&& aToMove)
-      : mSettings(mozilla::Move(aToMove.mSettings))
+      : PLDHashEntryHdr(mozilla::Move(aToMove))
+      , mSettings(mozilla::Move(aToMove.mSettings))
       , mEntryKey(mozilla::Move(aToMove.mEntryKey))
     {
     }

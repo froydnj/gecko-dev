@@ -3654,8 +3654,9 @@ HTMLMediaElement::MozCaptureStreamUntilEnded(ErrorResult& aRv)
 class MediaElementSetForURI : public nsURIHashKey {
 public:
   explicit MediaElementSetForURI(const nsIURI* aKey) : nsURIHashKey(aKey) {}
-  MediaElementSetForURI(const MediaElementSetForURI& toCopy)
-    : nsURIHashKey(toCopy), mElements(toCopy.mElements) {}
+  MediaElementSetForURI(MediaElementSetForURI&& aOther)
+    : nsURIHashKey(mozilla::Move(aOther))
+    , mElements(mozilla::Move(aOther.mElements)) {}
   nsTArray<HTMLMediaElement*> mElements;
 };
 

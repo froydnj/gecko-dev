@@ -11,8 +11,8 @@ nsHtml5AtomEntry::nsHtml5AtomEntry(KeyTypePointer aStr)
 {
 }
 
-nsHtml5AtomEntry::nsHtml5AtomEntry(const nsHtml5AtomEntry& aOther)
-  : nsStringHashKey(aOther)
+nsHtml5AtomEntry::nsHtml5AtomEntry(nsHtml5AtomEntry&& aOther)
+  : nsStringHashKey(mozilla::Move(aOther))
   , mAtom(nullptr)
 {
   NS_NOTREACHED("nsHtml5AtomTable is broken and tried to copy an entry");
