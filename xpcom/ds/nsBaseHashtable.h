@@ -130,6 +130,22 @@ public:
   }
 
   /**
+   * Add key to the table if not already present, and return a reference to its
+   * value.  If key is not already in the table then the value is default
+   * constructed.
+   *
+   */
+  DataType* GetOrInsert(const KeyType& aKey, const fallible_t&)
+  {
+    EntryType* ent = this->PutEntry(aKey, mozilla::fallible);
+    if (!ent) {
+      return nullptr;
+    }
+
+    return &ent->mData;
+  }
+
+  /**
    * Put a new value for the associated key
    * @param aKey the key to put
    * @param aData the new data
