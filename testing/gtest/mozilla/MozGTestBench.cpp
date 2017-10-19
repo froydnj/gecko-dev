@@ -29,7 +29,9 @@ void GTestBench(const char* aSuite, const char* aName,
   for (int i=0; i<MOZ_GTEST_NUM_ITERATIONS; i++) {
     mozilla::TimeStamp start = TimeStamp::Now();
 
-    aTest();
+    for (size_t j = 0; j < 50000; ++j) {
+      aTest();
+    }
 
     durations.push_back((TimeStamp::Now() - start).ToMicroseconds());
   }

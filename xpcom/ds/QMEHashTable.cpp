@@ -22,6 +22,22 @@ using namespace mozilla;
 
 // TODO: thread-safety checks
 
+// Hash key types accepted by ns*Hashtable usually (assuming that ENABLE_MEMMOVE
+// is defined) move entire objects via their moveEntry vtable method.  If
+// ENABLE_MEMMOVE is not defined--meaning that C++ move/copy construction is
+// used to implement moveEntry--many hash key types have a penchant for not
+// constructing the PLDHashEntryHdr parent object during their move/copy
+// constructors.  This omission means that the underlying hashtable
+// implementation (PLD/QMEHashtable) needs to copy around the stored hash from
+// PLDHashEntryHdr itself.  This manual copying is inelegant for ENABLE_MEMMOVE
+// key types, and an efficiency loss for !ENABLE_MEMMOVE key types, since the
+// latter's memcpy()-based copying will transfer the stored hash just fine.
+//
+// We therefore have this define to test how much of a difference omitting the
+// manual hash copying makes; initial testing says "not very much", but it's
+// still wasted work, and we should clean up the hash key types to work properly.
+//#define BROKEN_HASH_KEYS
+
 static bool
 QSizeOfEntryStore(uint32_t aCapacity, uint32_t aEntrySize, uint32_t* aNbytes)
 {
@@ -312,6 +328,7 @@ private:
   uint32_t mEntryIndex;
   PLDHashEntryHdr* mEntry;
 };
+#endif
 
 template<QMEHashTable::SearchReason Reason>
 PLDHashEntryHdr*
@@ -333,19 +350,19 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
   //
   // We are guaranteed to find a new entry.
 
-  // Compute the initial bucket for the key.
-  uint32_t bucketIndex = IdealBucketIndex(aKeyHash);
-
   uint32_t probeLength = 0;
   void* temporaryStorage[256 / sizeof(void*)];
   PLDHashEntryHdr* temporary = reinterpret_cast<PLDHashEntryHdr*>(&temporaryStorage[0]);
   bool reinserting = false;
   PLDHashEntryHdr* retval = nullptr;
 
+  EntryIterator iter = EntryIterator::FromHash(mEntryStore.Get(), mEntrySize,
+                                               mSizeMask, aKeyHash);
+
   for (;;) {
     //MOZ_RELEASE_ASSERT(bucketIndex < CapacityFromHashShift());
 
-    PLDHashEntryHdr* entry = AddressEntry(bucketIndex);
+    PLDHashEntryHdr* entry = iter.Entry();
 
     // If our current bucket is free, then we are all done.
     if (EntryIsFree(entry)) {
@@ -354,9 +371,13 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
       if (reinserting) {
         MOZ_ASSERT(addingEntry);
         MOZ_ASSERT(retval);
+#ifdef BROKEN_HASH_KEYS
         PLDHashNumber tempHash = temporary->mKeyHash;
+#endif
         mOps->moveEntry(this, temporary, entry);
+#ifdef BROKEN_HASH_KEYS
         entry->mKeyHash = tempHash;
+#endif
         return retval;
       }
       return (addingEntry) ? entry : nullptr;
@@ -416,14 +437,18 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
     // 3b. Continue inserting the new temporary entry.
     if (addingEntry) {
       // What is the current element's probe length?
-      uint32_t existingProbeLength = (bucketIndex - entry->mKeyHash) & mSizeMask;
+      uint32_t existingProbeLength = iter.ProbeLength(entry->mKeyHash);
 
       if (existingProbeLength < probeLength) {
         if (!reinserting) {
           reinserting = true;
+#ifdef BROKEN_HASH_KEYS
           PLDHashNumber entryHash = entry->mKeyHash;
+#endif
           mOps->moveEntry(this, entry, temporary);
+#ifdef BROKEN_HASH_KEYS
           temporary->mKeyHash = entryHash;
+#endif
           // Entry is now destroyed and we can use it.
           retval = entry;
         } else {
@@ -434,8 +459,10 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
           // XXX it's not clear whether the three function calls we require
           // here could be more efficiently exposed by having a `swapEntries`
           // method and calling that, thus enabling the swap to be "inlined".
+#ifdef BROKEN_HASH_KEYS
           PLDHashNumber entryHash = entry->mKeyHash;
           PLDHashNumber temporaryHash = temporary->mKeyHash;
+#endif
           QMEHashMoveEntry move = mOps->moveEntry;
           move(this, temporary, retval);
           move(this, entry, temporary);
@@ -444,8 +471,10 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
           // after the actual moves rather than before in case moveEntry
           // does implement moving mKeyHash, so we can make sure that
           // the hashes wind up where they are supposed to.
+#ifdef BROKEN_HASH_KEYS
           entry->mKeyHash = temporaryHash;
           temporary->mKeyHash = entryHash;
+#endif
         }
 
         MarkEntryFree(retval);
@@ -469,7 +498,7 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
       // free entry.  So we fall through here.
     }
 
-    bucketIndex = (bucketIndex + 1) & mSizeMask;
+    ++iter;
     ++probeLength;
   }
 
@@ -533,13 +562,7 @@ QMEHashTable::Add(const void* aKey, const mozilla::fallible_t&)
   // edge of being overloaded.
   uint32_t capacity = Capacity();
   if (mEntryCount >= QMaxLoad(capacity)) {
-    // Compress if a quarter or more of all entries are removed.
-    int deltaLog2;
-    if (mHighWaterEntryCount - mEntryCount >= capacity >> 2) {
-      deltaLog2 = 0;
-    } else {
-      deltaLog2 = 1;
-    }
+    int deltaLog2 = 1;
 
     // Grow or compress the table. If ChangeTable() fails, allow overloading up
     // to the secondary max. Once we hit the secondary max, return null.
@@ -626,7 +649,9 @@ QMEHashTable::ChangeTable(int32_t aDeltaLog2)
       PLDHashEntryHdr* newEntry = SearchTable<ForAddDuringResize>(nullptr, oldEntry->mKeyHash);
       MOZ_ASSERT(EntryIsFree(newEntry), "should have found a completely new entry");
       moveEntry(this, oldEntry, newEntry);
+#ifdef BROKEN_HASH_KEYS
       newEntry->mKeyHash = oldEntry->mKeyHash;
+#endif
     }
     oldEntryAddr += mEntrySize;
   }
@@ -705,7 +730,9 @@ QMEHashTable::RawRemove(PLDHashEntryHdr* aEntry)
     // repeat the process.
     mOps->moveEntry(this, nextEntry, emptyEntry);
     // XXX moveEntry should really do this for us.
+#ifdef BROKEN_HASH_KEYS
     emptyEntry->mKeyHash = nextEntry->mKeyHash;
+#endif
     MarkEntryFree(nextEntry);
 
     MOZ_ASSERT(EntryIsLive(emptyEntry));
@@ -724,8 +751,7 @@ void
 QMEHashTable::ShrinkIfAppropriate()
 {
   uint32_t capacity = Capacity();
-  if (mHighWaterEntryCount - mEntryCount >= capacity >> 2 ||
-      (capacity > kMinCapacity && mEntryCount <= MinLoad(capacity))) {
+  if (capacity > kMinCapacity && mEntryCount <= MinLoad(capacity)) {
     uint32_t log2;
     QBestCapacity(mEntryCount, &capacity, &log2);
 
