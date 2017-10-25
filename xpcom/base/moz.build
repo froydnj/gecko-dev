@@ -106,6 +106,7 @@ EXPORTS.mozilla += [
     'Debug.h',
     'DebuggerOnGCRunnable.h',
     'DeferredFinalize.h',
+    'DumpableLeakedThing.h',
     'EnumeratedArrayCycleCollection.h',
     'ErrorNames.h',
     'HoldDropJSObjects.h',
