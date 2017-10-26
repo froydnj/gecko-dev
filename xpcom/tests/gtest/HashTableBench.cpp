@@ -78,7 +78,7 @@ IntegerInsert(const OpsType* aOps, const nsTArray<uint64_t>& aIntegers)
   typedef typename TableTypeFromOps<OpsType>::Type TableType;
 
   // Try to eliminate as much resizing as possible by providing a default size.
-  TableType table(aOps, sizeof(PLDHashEntryStub), 2*aIntegers.Length());
+  TableType table(aOps, sizeof(PLDHashEntryStub));
 
   for (const auto& n : mozilla::MakeSpan(aIntegers)) {
     bool success = table.Add(reinterpret_cast<const void*>(n), fallible);
@@ -353,8 +353,7 @@ StringInsert(const OpsType* aOps, const nsTArray<nsCString>& aStrings)
 {
   typedef typename TableTypeFromOps<OpsType>::Type TableType;
 
-  size_t count = aStrings.Length();
-  TableType table(aOps, sizeof(StringBenchEntry), count * 2);
+  TableType table(aOps, sizeof(StringBenchEntry));
 
   for (const auto& s : mozilla::MakeSpan(aStrings)) {
     bool success = table.Add(&s, fallible);
@@ -580,6 +579,48 @@ IterateRemoveBench(const OpsType* aOps, const nsTArray<uint64_t>& aIntegers)
     ASSERT_TRUE(!!e);
     iter.Remove();
   }
+}
+
+class GrowTable : public ::testing::Test
+{
+protected:
+  static void SetUpTestCase();
+  static void TearDownTestCase();
+
+  static PLDHashTable* mPLD;
+  static QMEHashTable* mQME;
+};
+
+PLDHashTable* GrowTable::mPLD;
+QMEHashTable* GrowTable::mQME;
+/*static*/ void
+GrowTable::SetUpTestCase()
+{
+  mPLD = new PLDHashTable(&genericPOps, sizeof(PLDHashEntryStub));
+  mQME = new QMEHashTable(&genericQOps, sizeof(PLDHashEntryStub));
+
+  for (size_t i = 1; i < 1001; ++i) {
+    mPLD->Add(reinterpret_cast<const void*>(i));
+    mQME->Add(reinterpret_cast<const void*>(i));
+  }
+}
+
+MOZ_GTEST_BENCH_F(GrowTable, PLDGrow, []() {
+    for (size_t i = 2000; i < 3000; ++i) {
+      mPLD->Add(reinterpret_cast<const void*>(i));
+    }
+  });
+MOZ_GTEST_BENCH_F(GrowTable, QMEGrow, []() {
+    for (size_t i = 2000; i < 3000; ++i) {
+      mQME->Add(reinterpret_cast<const void*>(i));
+    }
+  });
+
+/*static*/ void
+GrowTable::TearDownTestCase()
+{
+  delete mPLD;
+  delete mQME;
 }
 
 MOZ_GTEST_BENCH_F(HashIntegers, QME_IterateRemove_Generic_Random, []() {
