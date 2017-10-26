@@ -623,6 +623,164 @@ GrowTable::TearDownTestCase()
   delete mQME;
 }
 
+class SearchIntegers : public ::testing::Test {
+protected:
+  static void SetUpTestCase();
+  static void TearDownTestCase();
+
+  virtual void SetUp() override;
+  virtual void TearDown() override;
+
+  PLDHashTable* mPLD;
+  QMEHashTable* mQME;
+
+  static const size_t kCount = 100;
+  static nsTArray<uint64_t> sSortedIntegers;
+  static nsTArray<uint64_t> sRandomIntegers;
+};
+
+nsTArray<uint64_t> SearchIntegers::sSortedIntegers;
+nsTArray<uint64_t> SearchIntegers::sRandomIntegers;
+
+/* static */ void
+SearchIntegers::SetUpTestCase()
+{
+  mozilla::non_crypto::XorShift128PlusRNG rng(0xdeadbeeffeedface, 0xc0ffeecafeba5edd);
+
+  sSortedIntegers.SetCapacity(kCount);
+  for (size_t i = 0; i < kCount; ++i) {
+    sSortedIntegers.AppendElement(i);
+  }
+
+  sRandomIntegers.SetCapacity(kCount);
+  for (size_t i = 0; i < kCount; ++i) {
+    sRandomIntegers.AppendElement(rng.next());
+  }
+}
+
+/*static*/ void
+SearchIntegers::TearDownTestCase()
+{
+  sSortedIntegers.Clear();
+  sRandomIntegers.Clear();
+}
+
+void
+SearchIntegers::SetUp()
+{
+  mPLD = new PLDHashTable(&genericPOps, sizeof(PLDHashEntryStub));
+  mQME = new QMEHashTable(&genericQOps, sizeof(PLDHashEntryStub));
+
+  for (auto& i : sRandomIntegers) {
+    mPLD->Add(reinterpret_cast<const void*>(i));
+    mQME->Add(reinterpret_cast<const void*>(i));
+  }
+}
+
+void
+SearchIntegers::TearDown()
+{
+  delete mPLD;
+  delete mQME;
+}
+
+MOZ_GTEST_BENCH_F(SearchIntegers, PLDSearch, [this]() {
+    for (size_t i = 0; i < 10; ++i) {
+      for (auto j : sRandomIntegers) {
+        mPLD->Search(reinterpret_cast<const void*>(j));
+      }
+    }
+  });
+MOZ_GTEST_BENCH_F(SearchIntegers, QMESearch, [this]() {
+    for (size_t i = 0; i < 10; ++i) {
+      for (auto j : sRandomIntegers) {
+        mQME->Search(reinterpret_cast<const void*>(j));
+      }
+    }
+  });
+
+class FailedSearchIntegers : public ::testing::Test {
+protected:
+  static void SetUpTestCase();
+  static void TearDownTestCase();
+
+  virtual void SetUp() override;
+  virtual void TearDown() override;
+
+  PLDHashTable* mPLD;
+  QMEHashTable* mQME;
+
+  static const size_t kCount = 100;
+  static nsTArray<uint64_t> sSortedIntegers;
+  static nsTArray<uint64_t> sRandomIntegers;
+};
+
+nsTArray<uint64_t> FailedSearchIntegers::sSortedIntegers;
+nsTArray<uint64_t> FailedSearchIntegers::sRandomIntegers;
+
+/* static */ void
+FailedSearchIntegers::SetUpTestCase()
+{
+  mozilla::non_crypto::XorShift128PlusRNG rng(0xdeadbeeffeedface, 0xc0ffeecafeba5eca);
+
+  sSortedIntegers.SetCapacity(kCount);
+  for (size_t i = 0; i < kCount; ++i) {
+    sSortedIntegers.AppendElement(i);
+  }
+
+  sRandomIntegers.SetCapacity(kCount);
+  for (size_t i = 0; i < kCount; ++i) {
+    sRandomIntegers.AppendElement(rng.next());
+  }
+}
+
+/*static*/ void
+FailedSearchIntegers::TearDownTestCase()
+{
+  sSortedIntegers.Clear();
+  sRandomIntegers.Clear();
+}
+
+void
+FailedSearchIntegers::SetUp()
+{
+  // We want the tables to have roughly similar load factors.  If we accept
+  // the default sizing and growth strategy for both tables, we'll wind up with
+  // PLDHashTable being ~45% full, and QMEHashTable being ~75% full, which
+  // penalizes QMEHashTable, since it has to search potentially longer chains.
+  mPLD = new PLDHashTable(&genericPOps, sizeof(PLDHashEntryStub), kCount*2);
+  mQME = new QMEHashTable(&genericQOps, sizeof(PLDHashEntryStub), kCount*2);
+
+  for (auto& i : MakeSpan(sRandomIntegers).First(kCount-1)) {
+    mPLD->Add(reinterpret_cast<const void*>(i));
+    mQME->Add(reinterpret_cast<const void*>(i));
+  }
+
+  printf("PLD %u/%u QME %u/%u\n",
+         mPLD->EntryCount(), mPLD->Capacity(),
+         mQME->EntryCount(), mQME->Capacity());
+}
+
+void
+FailedSearchIntegers::TearDown()
+{
+  delete mPLD;
+  delete mQME;
+}
+
+MOZ_GTEST_BENCH_F(FailedSearchIntegers, PLDSearch, [this]() {
+    const void* k = reinterpret_cast<const void*>(sRandomIntegers[kCount-1]);
+    for (size_t i = 0; i < 1000; ++i) {
+      mPLD->Search(k);
+    }
+  });
+MOZ_GTEST_BENCH_F(FailedSearchIntegers, QMESearch, [this]() {
+    const void* k = reinterpret_cast<const void*>(sRandomIntegers[kCount-1]);
+    for (size_t i = 0; i < 1000; ++i) {
+      mQME->Search(k);
+    }
+  });
+
 MOZ_GTEST_BENCH_F(HashIntegers, QME_IterateRemove_Generic_Random, []() {
     IterateRemoveBench(&genericQOps, sRandomIntegers);
   });
