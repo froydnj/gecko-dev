@@ -670,6 +670,7 @@ bool
 CustomElf::RelocateJumps()
 {
   /* TODO: Dynamic symbol resolution */
+  bool failed_with_null = false;
   for (Array<Reloc>::iterator rel = jumprels.begin();
        rel < jumprels.end(); ++rel) {
     /* Location of the relocation */
@@ -698,13 +699,13 @@ CustomElf::RelocateJumps()
         ERROR("%s: Relocation to NULL @0x%08" PRIxPTR " for symbol \"%s\"",
             GetPath(),
             uintptr_t(rel->r_offset), strtab.GetStringAt(sym.st_name));
-        return false;
+        failed_with_null = true;
       }
     }
     /* Apply relocation */
     *(void **) ptr = symptr;
   }
-  return true;
+  return !failed_with_null;
 }
 
 bool
