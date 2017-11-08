@@ -38,6 +38,12 @@ using namespace mozilla;
 // still wasted work, and we should clean up the hash key types to work properly.
 //#define BROKEN_HASH_KEYS
 
+#if 1
+#define QME_PRINTF(...)
+#else
+#define QME_PRINTF(...) printf(__VA_ARGS__)
+#endif
+
 static bool
 QSizeOfEntryStore(uint32_t aCapacity, uint32_t aEntrySize, uint32_t* aNbytes)
 {
@@ -359,10 +365,18 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
   EntryIterator iter = EntryIterator::FromHash(mEntryStore.Get(), mEntrySize,
                                                mSizeMask, aKeyHash);
 
+  if (Reason == ForAdd) {
+    QME_PRINTF("inserting entry with hash %x (mask %u)\n", aKeyHash, mSizeMask);
+  }
+
   for (;;) {
     //MOZ_RELEASE_ASSERT(bucketIndex < CapacityFromHashShift());
 
     PLDHashEntryHdr* entry = iter.Entry();
+
+    if (Reason == ForAdd) {
+      QME_PRINTF("Attempting entry %u (probe %u)\n", iter.EntryIndex(), probeLength);
+    }
 
     // If our current bucket is free, then we are all done.
     if (EntryIsFree(entry)) {
@@ -440,6 +454,10 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
       uint32_t existingProbeLength = iter.ProbeLength(entry->mKeyHash);
 
       if (existingProbeLength < probeLength) {
+        if (Reason == ForAdd) {
+          QME_PRINTF("existingProbeLength @ %u (hash %x) < %u\n", existingProbeLength,
+                 entry->mKeyHash, probeLength);
+        }
         if (!reinserting) {
           reinserting = true;
 #ifdef BROKEN_HASH_KEYS
@@ -639,8 +657,28 @@ QMEHashTable::ChangeTable(int32_t aDeltaLog2)
   mEntryStore.Set(newEntryStore, &mGeneration);
   QMEHashMoveEntry moveEntry = mOps->moveEntry;
 
-  // Copy live entries to the new table.
   uint32_t oldCapacity = 1u << oldLog2;
+
+  // Dump some statistics about table entries.
+  uint32_t exactEntries = 0;
+  QME_PRINTF("Table capacity prior to resize: %u\n", oldCapacity);
+  QME_PRINTF("#entries: %u\n", mEntryCount);
+  for (uint32_t i = 0; i < oldCapacity; ++i) {
+    PLDHashEntryHdr* oldEntry = (PLDHashEntryHdr*)oldEntryAddr;
+    if (EntryIsLive(oldEntry)) {
+      uint32_t hash = oldEntry->mKeyHash;
+      uint32_t desired = hash & (oldCapacity - 1);
+      QME_PRINTF("Entry %u | hash %x | desired %u\n", i, hash, desired);
+      if (desired == i) {
+        exactEntries++;
+      }
+    }
+    oldEntryAddr += mEntrySize;
+  }
+  QME_PRINTF("#exact: %u\n", exactEntries);
+
+  oldEntryAddr = oldEntryStore;
+  // Copy live entries to the new table.
   for (uint32_t i = 0; i < oldCapacity; ++i) {
     PLDHashEntryHdr* oldEntry = (PLDHashEntryHdr*)oldEntryAddr;
     if (EntryIsLive(oldEntry)) {
@@ -655,6 +693,22 @@ QMEHashTable::ChangeTable(int32_t aDeltaLog2)
     }
     oldEntryAddr += mEntrySize;
   }
+
+  // Dump some statistics about table entries.
+  char* newEntryAddr = newEntryStore;
+  exactEntries = 0;
+  for (uint32_t i = 0; i < newCapacity; ++i) {
+    PLDHashEntryHdr* oldEntry = (PLDHashEntryHdr*)newEntryAddr;
+    if (EntryIsLive(oldEntry)) {
+      uint32_t hash = oldEntry->mKeyHash;
+      uint32_t desired = hash & (newCapacity - 1);
+      if (desired == i) {
+        exactEntries++;
+      }
+    }
+    newEntryAddr += mEntrySize;
+  }
+  QME_PRINTF("new #exact: %u\n", exactEntries);
 
   free(oldEntryStore);
   return true;
