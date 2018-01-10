@@ -19,6 +19,11 @@ ifeq ($(HOST_OS_ARCH)_$(OS_ARCH),Linux_Darwin)
 CXX := $(HOST_CXX)
 endif
 
+ifeq ($(OS_TARGET),Android)
+# Use the host compiler instead of the target compiler.
+CXX := $(HOST_CXX)
+endif
+
 # Use the default OS X deployment target to enable using the libc++ headers
 # correctly.  Note that the binary produced here is a host tool and doesn't need
 # to be distributed.
