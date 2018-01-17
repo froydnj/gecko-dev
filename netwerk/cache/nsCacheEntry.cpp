@@ -499,8 +499,8 @@ nsCacheEntryHashTable::MoveEntry(PLDHashTable * /* table */,
                                  const PLDHashEntryHdr *from,
                                  PLDHashEntryHdr       *to)
 {
-    ((nsCacheEntryHashTableEntry *)to)->cacheEntry =
-        ((nsCacheEntryHashTableEntry *)from)->cacheEntry;
+    new (KnownNotNull, to) nsCacheEntryHashTableEntry(Move(*((nsCacheEntryHashTableEntry *)from)));
+    // No need to destroy `from`.
 }
 
 

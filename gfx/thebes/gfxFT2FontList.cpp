@@ -896,6 +896,7 @@ private:
         return entry->mFilename.Equals(reinterpret_cast<const char*>(key));
     }
 
+    /* XXX */
     static void MoveEntry(PLDHashTable *table, const PLDHashEntryHdr *aFrom,
                           PLDHashEntryHdr *aTo)
     {
