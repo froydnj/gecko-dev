@@ -276,15 +276,12 @@ nsAppFileLocationProvider::GetProductDirectory(nsIFile** aLocalFile,
   if (err) {
     return NS_ERROR_FAILURE;
   }
-  NS_NewLocalFile(EmptyString(), true, getter_AddRefs(localDir));
-  if (!localDir) {
-    return NS_ERROR_FAILURE;
-  }
-  nsCOMPtr<nsILocalFileMac> localDirMac(do_QueryInterface(localDir));
-  rv = localDirMac->InitWithFSRef(&fsRef);
+  nsCOMPtr<nsILocalFileMac> macFile;
+  rv = NS_NewLocalFileWithFSRef(&fsRef, true, getter_AddRefs(macFile));
   if (NS_FAILED(rv)) {
     return rv;
   }
+  localDir = macFile.forget();
 #elif defined(XP_WIN)
   nsCOMPtr<nsIProperties> directoryService =
     do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID, &rv);
