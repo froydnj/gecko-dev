@@ -1196,15 +1196,9 @@ GetNSS3Directory(nsCString& result)
 static nsresult
 GetDirectoryPath(const char* directoryKey, nsCString& result)
 {
-  nsCOMPtr<nsIProperties> directoryService(
-    do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID));
-  if (!directoryService) {
-    MOZ_LOG(gPIPNSSLog, LogLevel::Debug, ("could not get directory service"));
-    return NS_ERROR_FAILURE;
-  }
   nsCOMPtr<nsIFile> directory;
-  nsresult rv = directoryService->Get(directoryKey, NS_GET_IID(nsIFile),
-                                      getter_AddRefs(directory));
+  nsresult rv = NS_GetSpecialDirectory(directoryKey,
+                                       getter_AddRefs(directory));
   if (NS_FAILED(rv)) {
     MOZ_LOG(gPIPNSSLog, LogLevel::Debug,
             ("could not get '%s' from directory service", directoryKey));

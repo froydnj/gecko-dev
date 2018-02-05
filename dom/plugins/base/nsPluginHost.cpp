@@ -2813,12 +2813,8 @@ nsPluginHost::WritePluginInfo()
   MOZ_ASSERT(XRE_IsParentProcess());
 
   nsresult rv = NS_OK;
-  nsCOMPtr<nsIProperties> directoryService(do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID,&rv));
-  if (NS_FAILED(rv))
-    return rv;
-
-  directoryService->Get(NS_APP_USER_PROFILE_50_DIR, NS_GET_IID(nsIFile),
-                        getter_AddRefs(mPluginRegFile));
+  NS_GetSpecialDirectory(NS_APP_USER_PROFILE_50_DIR,
+                         getter_AddRefs(mPluginRegFile));
 
   if (!mPluginRegFile)
     return NS_ERROR_FAILURE;
@@ -2967,18 +2963,14 @@ nsPluginHost::ReadPluginInfo()
 
   nsresult rv;
 
-  nsCOMPtr<nsIProperties> directoryService(do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID,&rv));
-  if (NS_FAILED(rv))
-    return rv;
-
-  directoryService->Get(NS_APP_USER_PROFILE_50_DIR, NS_GET_IID(nsIFile),
-                        getter_AddRefs(mPluginRegFile));
+  NS_GetSpecialDirectory(NS_APP_USER_PROFILE_50_DIR,
+                         getter_AddRefs(mPluginRegFile));
 
   if (!mPluginRegFile) {
     // There is no profile yet, this will tell us if there is going to be one
     // in the future.
-    directoryService->Get(NS_APP_PROFILE_DIR_STARTUP, NS_GET_IID(nsIFile),
-                          getter_AddRefs(mPluginRegFile));
+    NS_GetSpecialDirectory(NS_APP_PROFILE_DIR_STARTUP,
+                           getter_AddRefs(mPluginRegFile));
     if (!mPluginRegFile)
       return NS_ERROR_FAILURE;
 

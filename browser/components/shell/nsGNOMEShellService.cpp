@@ -116,13 +116,9 @@ nsGNOMEShellService::Init()
   if (GetAppPathFromLauncher())
     return NS_OK;
 
-  nsCOMPtr<nsIProperties> dirSvc
-    (do_GetService("@mozilla.org/file/directory_service;1"));
-  NS_ENSURE_TRUE(dirSvc, NS_ERROR_NOT_AVAILABLE);
-
   nsCOMPtr<nsIFile> appPath;
-  rv = dirSvc->Get(XRE_EXECUTABLE_FILE, NS_GET_IID(nsIFile),
-                   getter_AddRefs(appPath));
+  rv = NS_GetSpecialDirectory(XRE_EXECUTABLE_FILE,
+                              getter_AddRefs(appPath));
   NS_ENSURE_SUCCESS(rv, rv);
 
   return appPath->GetNativePath(mAppPath);

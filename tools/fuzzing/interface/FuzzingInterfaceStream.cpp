@@ -20,13 +20,9 @@ namespace mozilla {
 #ifdef __AFL_COMPILER
 
 void afl_interface_stream(const char* testFile, FuzzingTestFuncStream testFunc) {
-    nsresult rv;
-    nsCOMPtr<nsIProperties> dirService =
-      do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID);
-    MOZ_RELEASE_ASSERT(dirService != nullptr);
     nsCOMPtr<nsIFile> file;
-    rv = dirService->Get(NS_OS_CURRENT_WORKING_DIR,
-                         NS_GET_IID(nsIFile), getter_AddRefs(file));
+    nsresult rv = NS_GetSpecialDirectory(NS_OS_CURRENT_WORKING_DIR,
+                                         getter_AddRefs(file));
     MOZ_RELEASE_ASSERT(NS_SUCCEEDED(rv));
     file->AppendNative(nsDependentCString(testFile));
     while(__AFL_LOOP(1000)) {

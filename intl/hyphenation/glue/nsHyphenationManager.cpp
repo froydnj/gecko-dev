@@ -145,24 +145,17 @@ nsHyphenationManager::LoadPatternList()
   LoadPatternListFromOmnijar(Omnijar::GRE);
   LoadPatternListFromOmnijar(Omnijar::APP);
 
-  nsCOMPtr<nsIProperties> dirSvc =
-    do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID);
-  if (!dirSvc) {
-    return;
-  }
-
   nsresult rv;
   nsCOMPtr<nsIFile> greDir;
-  rv = dirSvc->Get(NS_GRE_DIR,
-                   NS_GET_IID(nsIFile), getter_AddRefs(greDir));
+  rv = NS_GetSpecialDirectory(NS_GRE_DIR, getter_AddRefs(greDir));
   if (NS_SUCCEEDED(rv)) {
     greDir->AppendNative(NS_LITERAL_CSTRING("hyphenation"));
     LoadPatternListFromDir(greDir);
   }
 
   nsCOMPtr<nsIFile> appDir;
-  rv = dirSvc->Get(NS_XPCOM_CURRENT_PROCESS_DIR,
-                   NS_GET_IID(nsIFile), getter_AddRefs(appDir));
+  rv = NS_GetSpecialDirectory(NS_XPCOM_CURRENT_PROCESS_DIR,
+                              getter_AddRefs(appDir));
   if (NS_SUCCEEDED(rv)) {
     appDir->AppendNative(NS_LITERAL_CSTRING("hyphenation"));
     bool equals;
@@ -173,7 +166,7 @@ nsHyphenationManager::LoadPatternList()
 
   nsCOMPtr<nsIFile> profileDir;
   rv = NS_GetSpecialDirectory(NS_APP_USER_PROFILE_LOCAL_50_DIR,
-                                       getter_AddRefs(profileDir));
+                              getter_AddRefs(profileDir));
   if (NS_SUCCEEDED(rv)) {
       profileDir->AppendNative(NS_LITERAL_CSTRING("hyphenation"));
       LoadPatternListFromDir(profileDir);

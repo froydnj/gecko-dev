@@ -98,12 +98,9 @@ int RunGTestFunc(int* argc, char** argv)
     if (crashreporter) {
       std::cerr << "Setting up crash reporting" << std::endl;
 
-      nsCOMPtr<nsIProperties> dirsvc =
-          do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID);
       nsCOMPtr<nsIFile> cwd;
-      nsresult rv = dirsvc->Get(NS_OS_CURRENT_WORKING_DIR,
-                       NS_GET_IID(nsIFile),
-                       getter_AddRefs(cwd));
+      nsresult rv = NS_GetSpecialDirectory(NS_OS_CURRENT_WORKING_DIR,
+                                           getter_AddRefs(cwd));
       MOZ_RELEASE_ASSERT(NS_SUCCEEDED(rv));
       crashreporter->SetEnabled(true);
       crashreporter->SetMinidumpPath(cwd);

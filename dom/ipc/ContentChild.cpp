@@ -1527,13 +1527,7 @@ GetAppPaths(nsCString &aAppPath, nsCString &aAppBinaryPath, nsCString &aAppDir)
   }
 
   nsCOMPtr<nsIFile> appDir;
-  nsCOMPtr<nsIProperties> dirSvc =
-    do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID);
-  if (!dirSvc) {
-    return false;
-  }
-  rv = dirSvc->Get(NS_GRE_DIR,
-                   NS_GET_IID(nsIFile), getter_AddRefs(appDir));
+  rv = NS_GetSpecialDirectory(NS_GRE_DIR, getter_AddRefs(appDir));
   if (NS_FAILED(rv)) {
     return false;
   }

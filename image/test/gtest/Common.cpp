@@ -102,14 +102,9 @@ LoadFile(const char* aRelativePath)
 {
   nsresult rv;
 
-  nsCOMPtr<nsIProperties> dirService =
-    do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID);
-  ASSERT_TRUE_OR_RETURN(dirService != nullptr, nullptr);
-
   // Retrieve the current working directory.
   nsCOMPtr<nsIFile> file;
-  rv = dirService->Get(NS_OS_CURRENT_WORKING_DIR,
-                       NS_GET_IID(nsIFile), getter_AddRefs(file));
+  rv = NS_GetSpecialDirectory(NS_OS_CURRENT_WORKING_DIR, getter_AddRefs(file));
   ASSERT_TRUE_OR_RETURN(NS_SUCCEEDED(rv), nullptr);
 
   // Construct the final path by appending the working path to the current

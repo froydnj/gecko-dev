@@ -93,14 +93,10 @@ nsresult
 GetHelperPath(nsAutoString& aPath)
 {
   nsresult rv;
-  nsCOMPtr<nsIProperties> directoryService =
-    do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID, &rv);
-  NS_ENSURE_SUCCESS(rv, rv);
 
   nsCOMPtr<nsIFile> appHelper;
-  rv = directoryService->Get(XRE_EXECUTABLE_FILE,
-                             NS_GET_IID(nsIFile),
-                             getter_AddRefs(appHelper));
+  rv = NS_GetSpecialDirectory(XRE_EXECUTABLE_FILE,
+                              getter_AddRefs(appHelper));
   NS_ENSURE_SUCCESS(rv, rv);
 
   rv = appHelper->SetNativeLeafName(NS_LITERAL_CSTRING("uninstall"));

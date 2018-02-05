@@ -2036,14 +2036,8 @@ nsPrefBranch::GetComplexValue(const char* aPrefName,
     nsAutoCString key(Substring(keyBegin, keyEnd));
 
     nsCOMPtr<nsIFile> fromFile;
-    nsCOMPtr<nsIProperties> directoryService(
-      do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID, &rv));
-    if (NS_FAILED(rv)) {
-      return rv;
-    }
 
-    rv = directoryService->Get(
-      key.get(), NS_GET_IID(nsIFile), getter_AddRefs(fromFile));
+    rv = NS_GetSpecialDirectory(key.get(), getter_AddRefs(fromFile));
     if (NS_FAILED(rv)) {
       return rv;
     }
@@ -2160,14 +2154,9 @@ nsPrefBranch::SetComplexValue(const char* aPrefName,
     (void)relFilePref->GetRelativeToKey(relativeToKey);
 
     nsCOMPtr<nsIFile> relativeToFile;
-    nsCOMPtr<nsIProperties> directoryService(
-      do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID, &rv));
-    if (NS_FAILED(rv)) {
-      return rv;
-    }
 
-    rv = directoryService->Get(
-      relativeToKey.get(), NS_GET_IID(nsIFile), getter_AddRefs(relativeToFile));
+    rv = NS_GetSpecialDirectory(relativeToKey.get(),
+                                getter_AddRefs(relativeToFile));
     if (NS_FAILED(rv)) {
       return rv;
     }

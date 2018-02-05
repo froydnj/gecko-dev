@@ -136,15 +136,8 @@ PluginHangUIParent::Init(const nsString& aPluginName)
   nsresult rv;
   rv = mMiniShm.Init(this, ::IsDebuggerPresent() ? INFINITE : mIPCTimeoutMs);
   NS_ENSURE_SUCCESS(rv, false);
-  nsCOMPtr<nsIProperties>
-    directoryService(do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID));
-  if (!directoryService) {
-    return false;
-  }
   nsCOMPtr<nsIFile> greDir;
-  rv = directoryService->Get(NS_GRE_DIR,
-                             NS_GET_IID(nsIFile),
-                             getter_AddRefs(greDir));
+  rv = NS_GetSpecialDirectory(NS_GRE_DIR, getter_AddRefs(greDir));
   if (NS_FAILED(rv)) {
     return false;
   }

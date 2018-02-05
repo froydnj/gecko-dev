@@ -116,14 +116,8 @@ bool AutoObjectMapperPOSIX::Map(/*OUT*/void** start, /*OUT*/size_t* length,
 static char*
 get_installation_lib_dir()
 {
-  nsCOMPtr<nsIProperties>
-    directoryService(do_GetService(NS_DIRECTORY_SERVICE_CONTRACTID));
-  if (!directoryService) {
-    return nullptr;
-  }
   nsCOMPtr<nsIFile> greDir;
-  nsresult rv = directoryService->Get(NS_GRE_DIR, NS_GET_IID(nsIFile),
-                                      getter_AddRefs(greDir));
+  nsresult rv = NS_GetSpecialDirectory(NS_GRE_DIR, getter_AddRefs(greDir));
   if (NS_FAILED(rv)) return nullptr;
   nsCString path;
   rv = greDir->GetNativePath(path);
