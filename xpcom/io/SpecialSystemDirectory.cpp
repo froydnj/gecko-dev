@@ -725,6 +725,103 @@ GetSpecialSystemDirectory(SystemDirectories aSystemSystemDirectory,
     }
 #endif  // XP_WIN
 
+#if defined(MOZ_WIDGET_COCOA)
+    case Mac_SystemDirectory: {
+      return GetOSXFolderType(kClassicDomain, kSystemFolderType, aFile);
+    }
+    case Mac_TrashDirectory: {
+      return GetOSXFolderType(kClassicDomain, kTrashFolderType, aFile);
+    }
+    case Mac_StartupDirectory: {
+      return GetOSXFolderType(kClassicDomain, kStartupFolderType, aFile);
+    }
+    case Mac_ShutdownDirectory: {
+      return GetOSXFolderType(kClassicDomain, kShutdownFolderType, aFile);
+    }
+    case Mac_AppleMenuDirectory: {
+      return GetOSXFolderType(kClassicDomain, kAppleMenuFolderType, aFile);
+    }
+    case Mac_ControlPanelDirectory: {
+      return GetOSXFolderType(kClassicDomain, kControlPanelFolderType, aFile);
+    }
+    case Mac_ExtensionDirectory: {
+      return GetOSXFolderType(kClassicDomain, kExtensionFolderType, aFile);
+    }
+    case Mac_FontsDirectory: {
+      return GetOSXFolderType(kClassicDomain, kFontsFolderType, aFile);
+    }
+    case Mac_ClassicPreferencesDirectory: {
+      return GetOSXFolderType(kClassicDomain, kPreferencesFolderType, aFile);
+    }
+    case Mac_DocumentsDirectory: {
+      return GetOSXFolderType(kClassicDomain, kDocumentsFolderType, aFile);
+    }
+    case Mac_InternetSearchDirectory: {
+      return GetOSXFolderType(kClassicDomain, kInternetSearchSitesFolderType, aFile);
+    }
+    case Mac_UserLibDirectory: {
+      return GetOSXFolderType(kUserDomain, kDomainLibraryFolderType, aFile);
+    }
+    case Mac_HomeDirectory: {
+      return GetOSXFolderType(kUserDomain, kDomainTopLevelFolderType, aFile);
+    }
+    case Mac_DefaultDownloadDirectory: {
+      nsresult rv = GetOSXFolderType(kUserDoman, kDownloadsFolderType, aFile);
+      if (NS_FAILED(rv)) {
+        rv = GetOSXFolderType(kUserDomain, kDesktopFolderType, aFile);
+      }
+      return rv;
+    }
+    case Mac_UserDesktopDirectory: {
+      return GetOSXFolderType(kUserDomain, kDestopFolderType, aFile);
+    }
+    case Mac_LocalDesktopDirectory: {
+      return GetOSXFolderType(kLocalDomain, kDestopFolderType, aFile);
+    }
+    case Mac_UserApplicationsDirectory: {
+      return GetOSXFolderType(kUserDomain, kApplicationsFolderType, aFile);
+    }
+    case Mac_LocalApplicationsDirectory: {
+      return GetOSXFolderType(kLocalDomain, kApplicationsFolderType, aFile);
+    }
+    case Mac_UserDocumentsDirectory: {
+      return GetOSXFolderType(kUserDomain, kDocumentsFolderType, aFile);
+    }
+    case Mac_LocalDocumentsDirectory: {
+      return GetOSXFolderType(kLocalDomain, kDocumentsFolderType, aFile);
+    }
+    case Mac_UserInternetPluginDirectory: {
+      return GetOSXFolderType(kUserDomain, kInternetPlugInFolderType, aFile);
+    }
+    case Mac_LocalInternetPluginDirectory: {
+      return GetOSXFolderType(kLocalDomain, kInternetPlugInFolderType, aFile);
+    }
+    case Mac_UserFrameworksDirectory: {
+      return GetOSXFolderType(kUserDomain, kFrameworksFolderType, aFile);
+    }
+    case Mac_LocalFrameworksDirectory: {
+      return GetOSXFolderType(kLocalDomain, kFrameworksFolderType, aFile);
+    }
+    case Mac_UserPreferencesDirectory: {
+      return GetOSXFolderType(kUserDomain, kPreferencesFolderType, aFile);
+    }
+    case Mac_LocalPreferencesDirectory: {
+      return GetOSXFolderType(kLocalDomain, kPreferencesFolderType, aFile);
+    }
+    case Mac_PictureDocumentsDirectory: {
+      return GetOSXFolderType(kUserDomain, kPictureDocumentsFolderType, aFile);
+    }
+    case Mac_MovieDocumentsDirectory: {
+      return GetOSXFolderType(kUserDomain, kMovieDocumentsFolderType, aFile);
+    }
+    case Mac_MusicDocumentsDirectory: {
+      return GetOSXFolderType(kUserDomain, kMusicDocumentsFolderType, aFile);
+    }
+    case Mac_InternetSitesDirectory: {
+      return GetOSXFolderType(kUserDomain, kInternetSitesFolderType, aFile);
+    }
+#endif  // MOZ_WIDGET_COCOA
+
 #if defined(XP_UNIX)
     case Unix_LocalDirectory:
       return NS_NewNativeLocalFile(nsDependentCString("/usr/local/netscape/"),
