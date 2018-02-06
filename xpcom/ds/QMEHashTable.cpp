@@ -36,7 +36,7 @@ using namespace mozilla;
 // We therefore have this define to test how much of a difference omitting the
 // manual hash copying makes; initial testing says "not very much", but it's
 // still wasted work, and we should clean up the hash key types to work properly.
-//#define BROKEN_HASH_KEYS
+#define BROKEN_HASH_KEYS
 
 #if 1
 #define QME_PRINTF(...)
@@ -336,6 +336,18 @@ private:
 };
 #endif
 
+class AutoLog
+{
+  uint32_t& mInt;
+  const char* mDescription;
+
+public:
+  AutoLog(uint32_t& toLog, const char* description) : mInt(toLog), mDescription(description) {}
+  ~AutoLog() {
+    printf("%s: %u\n", mDescription, (uint32_t)mInt);
+  }
+};
+
 template<QMEHashTable::SearchReason Reason>
 PLDHashEntryHdr*
 QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
@@ -357,6 +369,7 @@ QMEHashTable::SearchTable(const void* aKey, PLDHashNumber aKeyHash)
   // We are guaranteed to find a new entry.
 
   uint32_t probeLength = 0;
+  AutoLog log(probeLength, "SearchTable probe length");
   void* temporaryStorage[256 / sizeof(void*)];
   PLDHashEntryHdr* temporary = reinterpret_cast<PLDHashEntryHdr*>(&temporaryStorage[0]);
   bool reinserting = false;
@@ -761,6 +774,8 @@ QMEHashTable::RawRemove(PLDHashEntryHdr* aEntry)
   // Look for an free entry or an entry that is exactly where it wants to be.
   uint32_t emptyBucket = EntryToBucketIndex(aEntry);
   PLDHashEntryHdr* emptyEntry = aEntry;
+  uint32_t iterationCount = 0;
+  AutoLog log(iterationCount, "RawRemove shift count");
   for (;;) {
     MOZ_ASSERT(EntryIsFree(emptyEntry));
 
@@ -793,6 +808,7 @@ QMEHashTable::RawRemove(PLDHashEntryHdr* aEntry)
 
     emptyBucket = nextBucket;
     emptyEntry = nextEntry;
+    iterationCount++;
   }
 
   mEntryCount--;

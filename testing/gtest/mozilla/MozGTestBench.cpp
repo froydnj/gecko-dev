@@ -10,7 +10,7 @@
 #include <vector>
 
 #define MOZ_GTEST_BENCH_FRAMEWORK "platform_microbench"
-#define MOZ_GTEST_NUM_ITERATIONS 5
+#define MOZ_GTEST_NUM_ITERATIONS 1
 
 using mozilla::TimeStamp;
 
@@ -29,7 +29,7 @@ void GTestBench(const char* aSuite, const char* aName,
   for (int i=0; i<MOZ_GTEST_NUM_ITERATIONS; i++) {
     mozilla::TimeStamp start = TimeStamp::Now();
 
-    for (size_t j = 0; j < 50000; ++j) {
+    for (size_t j = 0; j < 1; ++j) {
       aTest();
     }
 

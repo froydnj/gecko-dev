@@ -107,7 +107,7 @@ protected:
   static void SetUpTestCase();
   static void TearDownTestCase();
 
-  static const size_t kCount = 16;
+  static const size_t kCount = 16384;
   static nsTArray<uint64_t> sSortedIntegers;
   static nsTArray<uint64_t> sRandomIntegers;
 };
