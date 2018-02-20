@@ -344,7 +344,7 @@ class AutoLog
 public:
   AutoLog(uint32_t& toLog, const char* description) : mInt(toLog), mDescription(description) {}
   ~AutoLog() {
-    printf("%s: %u\n", mDescription, (uint32_t)mInt);
+    //printf("%s: %u\n", mDescription, (uint32_t)mInt);
   }
 };
 
