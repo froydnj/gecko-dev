@@ -271,9 +271,14 @@ def get_default_debugger_name(search=DebuggerSearch.OnlyFirst):
 
 def get_default_valgrind_args():
     return (['--fair-sched=yes',
-             '--smc-check=all-non-file',
+             #'--smc-check=all-non-file',
              '--vex-iropt-register-updates=allregs-at-mem-access',
              '--trace-children=yes',
+             '--track-origins=yes',
+             '--px-default=allregs-at-mem-access',
+             '--px-file-backed=unwindregs-at-mem-access',
+             '--num-transtab-sectors=24',
+             '--num-callers=36',
              '--child-silent-after-fork=yes',
              ('--trace-children-skip='
               + '/usr/bin/hg,/bin/rm,*/bin/certutil,*/bin/pk12util,'
@@ -290,4 +295,5 @@ def get_default_valgrind_tool_specific_args():
     return ['--partial-loads-ok=yes',
             '--leak-check=summary',
             '--show-possibly-lost=no',
+            '--expensive-definedness-checks=yes',
             ]
