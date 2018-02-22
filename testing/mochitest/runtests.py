@@ -2147,6 +2147,7 @@ toolbar#nav-bar {
 
             debug_args = ([valgrindPath]
                           + mozdebug.get_default_valgrind_args()
+                          + ['--fullpath-after=' + build_obj.topsrcdir]
                           + valgrindArgs_split
                           + valgrindSuppFiles_final)
 
