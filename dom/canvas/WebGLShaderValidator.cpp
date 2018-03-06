@@ -605,8 +605,10 @@ ShaderValidator::EnumerateFragOutputs(std::map<nsCString, const nsCString> &out_
 
     if (fragOutputs) {
         for (const auto& fragOutput : *fragOutputs) {
-            out_FragOutputs.insert({nsCString(fragOutput.name.c_str()),
-                                    nsCString(fragOutput.mappedName.c_str())});
+            out_FragOutputs.insert({nsCString(fragOutput.name.c_str(),
+                                              fragOutput.name.size()),
+                                    nsCString(fragOutput.mappedName.c_str(),
+                                              fragOutput.mappedName.size())});
         }
     }
 }
