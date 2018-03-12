@@ -459,7 +459,7 @@ struct AssertionConditionType
 #  define MOZ_ASSERT(...) do { } while (false)
 #endif /* DEBUG */
 
-#if defined(NIGHTLY_BUILD) || defined(MOZ_DEV_EDITION)
+#if 0 //defined(NIGHTLY_BUILD) || defined(MOZ_DEV_EDITION)
 #  define MOZ_DIAGNOSTIC_ASSERT MOZ_RELEASE_ASSERT
 #  define MOZ_DIAGNOSTIC_ASSERT_ENABLED 1
 #else
