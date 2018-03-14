@@ -98,3 +98,19 @@ for var in ('LINKER', 'OPTIMIZE'):
 if CONFIG['HOST_OS_ARCH'] == 'Linux' and CONFIG['OS_ARCH'] == 'Darwin':
     # Don't pass OSX linker arguments.
     LINK_FLAGS['FIX_LINK_PATHS'] = []
+
+if CONFIG['OS_TARGET'] == 'Android':
+    # Remove all of the target flags that point into the NDK.
+    for v in ('OS_CPPFLAGS',):
+        flags = []
+        idx = 0
+        for flag in COMPILE_FLAGS[v]:
+            if flag == '-isystem':
+                idx += 2
+                continue
+            elif flag.startswith(('-m', '-I')):
+                flags.append(flag)
+            elif flag == '-Qunused-arguments':
+                flags.append(flag)
+            idx += 1
+        COMPILE_FLAGS[v] = flags

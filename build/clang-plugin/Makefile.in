@@ -22,6 +22,13 @@ endif
 ifeq ($(OS_TARGET),Android)
 # Use the host compiler instead of the target compiler.
 CXX := $(HOST_CXX)
+
+# Remove Android-specific libraries from LINK_OS_LIBS.
+LINK_OS_LIBS := $(filter-out -llog,$(LINK_OS_LIBS))
+LINK_OS_LIBS := $(filter-out -lc++_static,$(LINK_OS_LIBS))
+LINK_OS_LIBS := $(filter-out -lc++abi,$(LINK_OS_LIBS))
+LINK_OS_LIBS := $(filter-out -lunwind,$(LINK_OS_LIBS))
+LINK_OS_LIBS := $(filter-out -landroid_support,$(LINK_OS_LIBS))
 endif
 
 # Use the default OS X deployment target to enable using the libc++ headers
