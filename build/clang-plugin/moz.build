@@ -47,6 +47,10 @@ if CONFIG['OS_ARCH'] == 'WINNT':
         'LoadLibraryUsageChecker.cpp',
     ]
 
+SOURCES += [
+    'LibStdCXXCompat.cpp',
+]
+
 if CONFIG['ENABLE_MOZSEARCH_PLUGIN']:
     UNIFIED_SOURCES += [
         'mozsearch-plugin/FileOperations.cpp',
@@ -114,3 +118,4 @@ if CONFIG['OS_TARGET'] == 'Android':
                 flags.append(flag)
             idx += 1
         COMPILE_FLAGS[v] = flags
+    DEFINES['_GLIBCXX_USE_CXX11_ABI'] = 0
