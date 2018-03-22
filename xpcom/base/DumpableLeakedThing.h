@@ -76,7 +76,7 @@ private:
   std::function<void(const T&)> mDescribeFun;
 
 public:
-  DumpLeaked(std::function<void(const T&)> aDescribeFun)
+  explicit DumpLeaked(std::function<void(const T&)> aDescribeFun)
     : mDescribeFun(aDescribeFun)
   {}
 
@@ -89,7 +89,7 @@ template<typename T>
 class DumpableLeakedThing : public LinkedListElement<DumpableLeakedThing<T>>
 {
 public:
-  DumpableLeakedThing(bool aEnable);
+  explicit DumpableLeakedThing(bool aEnable);
   // Default destructor will take care of removing `this` from `gAllObjects`.
 };
 

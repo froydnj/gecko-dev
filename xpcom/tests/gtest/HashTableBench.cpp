@@ -274,7 +274,7 @@ HashStrings::TearDownTestCase()
 class StringBenchEntry : public PLDHashEntryHdr
 {
 public:
-  StringBenchEntry(const nsCString* aStr)
+  explicit StringBenchEntry(const nsCString* aStr)
     : mStr(*aStr)
   {};
 

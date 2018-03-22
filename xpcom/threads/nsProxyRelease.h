@@ -278,6 +278,7 @@ private:
     if (NS_IsMainThread()) {
       // Ensure we drop the reference on the main thread.
       RefPtr<T> local(mozilla::Move(mPtr));
+      mozilla::Unused << local;
     } else if (mPtr) {
       if (!mMainThreadEventTarget) {
         mMainThreadEventTarget = do_GetMainThread();
