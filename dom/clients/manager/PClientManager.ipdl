@@ -16,7 +16,7 @@ include ClientIPCTypes;
 namespace mozilla {
 namespace dom {
 
-sync protocol PClientManager
+sync twophase protocol PClientManager
 {
   manager PBackground;
 

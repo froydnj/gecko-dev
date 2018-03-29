@@ -19,7 +19,7 @@ union IPCBlobOrError
   nsresult;
 };
 
-protocol PTemporaryIPCBlob
+twophase protocol PTemporaryIPCBlob
 {
   manager PBackground;
 

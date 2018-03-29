@@ -39,7 +39,7 @@ struct Attribute
   nsString Value;
 };
 
-sync protocol PDocAccessible
+sync twophase protocol PDocAccessible
 {
   manager PBrowser;
 

@@ -23,7 +23,7 @@ namespace mozilla {
 namespace net {
 
 //-------------------------------------------------------------------
-protocol PHttpChannel
+twophase protocol PHttpChannel
 {
   manager PNecko;
 

@@ -21,7 +21,7 @@ struct ScriptData {
     uint8_t[] xdrData;
 };
 
-protocol PScriptCache
+twophase protocol PScriptCache
 {
     manager PContent;
 

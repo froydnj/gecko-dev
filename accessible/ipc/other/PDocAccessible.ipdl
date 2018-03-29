@@ -45,7 +45,7 @@ struct RelationTargets
   uint64_t[] Targets;
 };
 
-nested(upto inside_sync) sync protocol PDocAccessible
+nested(upto inside_sync) sync twophase protocol PDocAccessible
 {
   manager PBrowser;
 

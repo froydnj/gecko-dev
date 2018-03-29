@@ -18,7 +18,7 @@ struct RemoteVoice {
   bool queued;
 };
 
-sync protocol PSpeechSynthesis
+sync twophase protocol PSpeechSynthesis
 {
   manager PContent;
   manages PSpeechSynthesisRequest;

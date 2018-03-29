@@ -8,7 +8,7 @@ include protocol PTestShell;
 namespace mozilla {
 namespace ipc {
 
-protocol PTestShellCommand
+twophase protocol PTestShellCommand
 {
   manager PTestShell;
 

@@ -215,6 +215,7 @@ class Protocol(NamespacedNode):
         NamespacedNode.__init__(self, loc)
         self.sendSemantics = ASYNC
         self.nested = NOT_NESTED
+        self.twoPhaseInit = False
         self.managers = [ ]
         self.managesStmts = [ ]
         self.messageDecls = [ ]

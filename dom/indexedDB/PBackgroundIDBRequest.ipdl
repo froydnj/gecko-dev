@@ -147,7 +147,7 @@ union PreprocessResponse
   ObjectStoreGetAllPreprocessResponse;
 };
 
-protocol PBackgroundIDBRequest
+twophase protocol PBackgroundIDBRequest
 {
   manager PBackgroundIDBTransaction or PBackgroundIDBVersionChangeTransaction;
 

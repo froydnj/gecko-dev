@@ -11,7 +11,7 @@ using GMPErr from "gmp-errors.h";
 namespace mozilla {
 namespace gmp {
 
-async protocol PGMPStorage
+async twophase protocol PGMPStorage
 {
   manager PGMP;
 

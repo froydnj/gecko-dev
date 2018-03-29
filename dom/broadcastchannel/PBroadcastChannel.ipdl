@@ -16,7 +16,7 @@ namespace mozilla {
 namespace dom {
 
 // This protocol is used for the BroadcastChannel API
-protocol PBroadcastChannel
+twophase protocol PBroadcastChannel
 {
   manager PBackground;
 

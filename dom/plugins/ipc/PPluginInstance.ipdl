@@ -60,7 +60,7 @@ union OptionalShmem {
   null_t;
 };
 
-intr protocol PPluginInstance
+intr twophase protocol PPluginInstance
 {
   manager PPluginModule;
 

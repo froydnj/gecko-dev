@@ -9,7 +9,7 @@ include protocol PPresentation;
 namespace mozilla {
 namespace dom {
 
-sync protocol PPresentationRequest
+sync twophase protocol PPresentationRequest
 {
   manager PPresentation;
 

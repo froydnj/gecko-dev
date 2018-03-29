@@ -35,7 +35,7 @@ union UsageRequestResponse
   OriginUsageResponse;
 };
 
-protocol PQuotaUsageRequest
+twophase protocol PQuotaUsageRequest
 {
   manager PQuota;
 

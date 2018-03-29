@@ -13,7 +13,7 @@ namespace net {
 
 // Used when diverting necko channels from child back to the parent.
 // See nsIDivertableChannel.
-async protocol PChannelDiverter
+async twophase protocol PChannelDiverter
 {
   manager PNecko;
 

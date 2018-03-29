@@ -22,7 +22,7 @@ union Variant {
   nullable PPluginScriptableObject;
 };
 
-intr protocol PPluginScriptableObject
+intr twophase protocol PPluginScriptableObject
 {
   manager PPluginInstance;
 

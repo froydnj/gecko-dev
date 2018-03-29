@@ -16,7 +16,7 @@ using PRTime from "prtime.h";
 namespace mozilla {
 namespace net {
 
-async protocol PFTPChannel
+async twophase protocol PFTPChannel
 {
   manager PNecko;
 

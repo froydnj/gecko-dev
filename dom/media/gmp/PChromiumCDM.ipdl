@@ -9,7 +9,7 @@ include GMPTypes;
 namespace mozilla {
 namespace gmp {
 
-async protocol PChromiumCDM
+async twophase protocol PChromiumCDM
 {
   manager PGMPContent;
 child:

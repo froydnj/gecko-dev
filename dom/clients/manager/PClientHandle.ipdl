@@ -13,7 +13,7 @@ include ClientIPCTypes;
 namespace mozilla {
 namespace dom {
 
-protocol PClientHandle
+twophase protocol PClientHandle
 {
   manager PClientManager;
 

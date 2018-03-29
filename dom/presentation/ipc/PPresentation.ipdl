@@ -70,7 +70,7 @@ union PresentationIPCRequest
   BuildTransportRequest;
 };
 
-sync protocol PPresentation
+sync twophase protocol PPresentation
 {
   manager PContent;
   manages PPresentationBuilder;

@@ -55,7 +55,7 @@ union RequestResponse
   PersistResponse;
 };
 
-protocol PQuotaRequest
+twophase protocol PQuotaRequest
 {
   manager PQuota;
 

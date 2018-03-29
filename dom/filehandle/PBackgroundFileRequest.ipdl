@@ -68,7 +68,7 @@ union FileRequestResponse
   FileRequestGetFileResponse;
 };
 
-protocol PBackgroundFileRequest
+twophase protocol PBackgroundFileRequest
 {
   manager PBackgroundFileHandle;
 

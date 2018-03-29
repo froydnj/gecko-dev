@@ -8,7 +8,7 @@ include protocol PContent;
 namespace mozilla {
 namespace dom {
 
-protocol PCycleCollectWithLogs {
+twophase protocol PCycleCollectWithLogs {
     manager PContent;
 
 parent:

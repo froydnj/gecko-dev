@@ -3,7 +3,7 @@ include protocol PTestBadActor;
 namespace mozilla {
 namespace _ipdltest {
 
-intr protocol PTestBadActorSub {
+intr twophase protocol PTestBadActorSub {
   manager PTestBadActor;
 
 child:

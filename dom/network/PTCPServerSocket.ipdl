@@ -14,7 +14,7 @@ namespace mozilla {
 namespace net {
 
 //-------------------------------------------------------------------
-protocol PTCPServerSocket
+twophase protocol PTCPServerSocket
 {
   manager PNecko;
 

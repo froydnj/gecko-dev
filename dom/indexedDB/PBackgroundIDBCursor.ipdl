@@ -83,7 +83,7 @@ union CursorResponse
   IndexKeyCursorResponse;
 };
 
-protocol PBackgroundIDBCursor
+twophase protocol PBackgroundIDBCursor
 {
   manager PBackgroundIDBTransaction or PBackgroundIDBVersionChangeTransaction;
 

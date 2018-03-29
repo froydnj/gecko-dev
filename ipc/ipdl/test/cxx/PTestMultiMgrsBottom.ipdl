@@ -4,7 +4,7 @@ include protocol PTestMultiMgrsRight;
 namespace mozilla {
 namespace _ipdltest {
 
-protocol PTestMultiMgrsBottom {
+twophase protocol PTestMultiMgrsBottom {
     manager PTestMultiMgrsLeft or PTestMultiMgrsRight;
 
 child:

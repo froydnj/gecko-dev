@@ -39,7 +39,7 @@ namespace mozilla {
 namespace net {
 
 //-------------------------------------------------------------------
-protocol PUDPSocket
+twophase protocol PUDPSocket
 {
   manager PNecko or PBackground;
 

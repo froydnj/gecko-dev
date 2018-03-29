@@ -11,7 +11,7 @@ include PURLClassifierInfo;
 namespace mozilla {
 namespace dom {
 
-protocol PURLClassifierLocal
+twophase protocol PURLClassifierLocal
 {
   manager PContent;
 

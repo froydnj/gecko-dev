@@ -8,7 +8,7 @@ include ClientIPCTypes;
 namespace mozilla {
 namespace dom {
 
-protocol PClientNavigateOp
+twophase protocol PClientNavigateOp
 {
   manager PClientManager;
 

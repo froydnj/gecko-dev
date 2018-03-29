@@ -127,6 +127,7 @@ reserved = set((
         'returns',
         'struct',
         'sync',
+        'twophase',
         'union',
         'upto',
         'using',
@@ -331,12 +332,13 @@ def p_ComponentTypes(p):
         p[0] = p[1]
 
 def p_ProtocolDefn(p):
-    """ProtocolDefn : OptionalProtocolSendSemanticsQual PROTOCOL ID '{' ProtocolBody '}' ';'"""
-    protocol = p[5]
-    protocol.loc = locFromTok(p, 2)
-    protocol.name = p[3]
+    """ProtocolDefn : OptionalProtocolSendSemanticsQual OptionalTwoPhaseInitQual PROTOCOL ID '{' ProtocolBody '}' ';'"""
+    protocol = p[6]
+    protocol.loc = locFromTok(p, 3)
+    protocol.name = p[4]
     protocol.nested = p[1][0]
     protocol.sendSemantics = p[1][1]
+    protocol.twoPhaseInit = p[2]
     p[0] = protocol
 
     if Parser.current.type == 'header':
@@ -541,6 +543,12 @@ def p_SendSemanticsQual(p):
     else: assert 0
 
     p[0] = [ quals.get('nested', NOT_NESTED), quals.get('prio', NORMAL_PRIORITY), mtype ]
+
+def p_OptionalTwoPhaseInitQual(p):
+    """OptionalTwoPhaseInitQual : TWOPHASE
+                                | """
+    if 2 == len(p): p[0] = True
+    else:           p[0] = False
 
 def p_OptionalProtocolSendSemanticsQual(p):
     """OptionalProtocolSendSemanticsQual : ProtocolSendSemanticsQual

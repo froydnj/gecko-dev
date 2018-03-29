@@ -72,7 +72,7 @@ union FileRequestParams
   FileRequestGetFileParams;
 };
 
-protocol PBackgroundFileHandle
+twophase protocol PBackgroundFileHandle
 {
   manager PBackgroundMutableFile;
 

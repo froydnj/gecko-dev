@@ -8,7 +8,7 @@ namespace mozilla {
 namespace ipc {
 
 // This is a very simple testing protocol that is only used during mochitests.
-protocol PBackgroundTest
+twophase protocol PBackgroundTest
 {
   manager PBackground;
 

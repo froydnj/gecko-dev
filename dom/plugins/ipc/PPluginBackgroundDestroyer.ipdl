@@ -20,7 +20,7 @@ namespace plugins {
  * background to actors of this protocol, which can deal with crashy
  * corner cases more easily than the instance.
  */
-protocol PPluginBackgroundDestroyer {
+twophase protocol PPluginBackgroundDestroyer {
     manager PPluginInstance;
 
     // The ctor message for this protocol serves double-duty as

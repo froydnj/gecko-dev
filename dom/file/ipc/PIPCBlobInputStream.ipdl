@@ -14,7 +14,7 @@ include IPCStream;
 namespace mozilla {
 namespace ipc {
 
-protocol PIPCBlobInputStream
+twophase protocol PIPCBlobInputStream
 {
   manager PBackground or PContent or PContentBridge;
 

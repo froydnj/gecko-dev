@@ -20,7 +20,7 @@ union DatabaseRequestResponse
   CreateFileRequestResponse;
 };
 
-protocol PBackgroundIDBDatabaseRequest
+twophase protocol PBackgroundIDBDatabaseRequest
 {
   manager PBackgroundIDBDatabase;
 

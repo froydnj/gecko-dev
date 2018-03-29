@@ -28,7 +28,7 @@ union FactoryRequestResponse
   DeleteDatabaseRequestResponse;
 };
 
-protocol PBackgroundIDBFactoryRequest
+twophase protocol PBackgroundIDBFactoryRequest
 {
   manager PBackgroundIDBFactory;
 

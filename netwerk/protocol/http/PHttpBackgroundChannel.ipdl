@@ -18,7 +18,7 @@ namespace mozilla {
 namespace net {
 
 //-------------------------------------------------------------------
-async protocol PHttpBackgroundChannel
+async twophase protocol PHttpBackgroundChannel
 {
   manager PBackground;
 
