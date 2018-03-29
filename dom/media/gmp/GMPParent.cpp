@@ -582,12 +582,6 @@ GMPParent::RecvPGMPStorageConstructor(PGMPStorageParent* aActor)
   return IPC_OK();
 }
 
-mozilla::ipc::IPCResult
-GMPParent::RecvPGMPTimerConstructor(PGMPTimerParent* actor)
-{
-  return IPC_OK();
-}
-
 PGMPTimerParent*
 GMPParent::AllocPGMPTimerParent()
 {

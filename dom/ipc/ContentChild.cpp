@@ -2026,12 +2026,6 @@ ContentChild::GetCPOWManager()
   return CPOWManagerFor(SendPJavaScriptConstructor());
 }
 
-mozilla::ipc::IPCResult
-ContentChild::RecvPTestShellConstructor(PTestShellChild* actor)
-{
-  return IPC_OK();
-}
-
 void
 ContentChild::UpdateCookieStatus(nsIChannel   *aChannel)
 {

@@ -262,8 +262,6 @@ public:
 
   virtual bool DeallocPTestShellChild(PTestShellChild*) override;
 
-  virtual mozilla::ipc::IPCResult RecvPTestShellConstructor(PTestShellChild*) override;
-
   virtual PScriptCacheChild*
   AllocPScriptCacheChild(const FileDescOrError& cacheFile,
                          const bool& wantCacheData) override;

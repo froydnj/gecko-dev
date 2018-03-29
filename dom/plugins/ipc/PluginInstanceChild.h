@@ -152,11 +152,6 @@ protected:
     RecvPPluginScriptableObjectConstructor(PPluginScriptableObjectChild* aActor) override;
 
     virtual mozilla::ipc::IPCResult
-    RecvPBrowserStreamConstructor(PBrowserStreamChild* aActor, const nsCString& aURL,
-                                  const uint32_t& aLength, const uint32_t& aLastmodified,
-                                  PStreamNotifyChild* aNotifyData, const nsCString& aHeaders) override;
-
-    virtual mozilla::ipc::IPCResult
     AnswerNPP_NewStream(
             PBrowserStreamChild* actor,
             const nsCString& mimeType,

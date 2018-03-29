@@ -57,11 +57,6 @@ public:
 
   virtual void ActorDestroy(ActorDestroyReason aWhy) override;
   virtual PCookieServiceParent* AllocPCookieServiceParent() override;
-  virtual mozilla::ipc::IPCResult
-  RecvPCookieServiceConstructor(PCookieServiceParent* aActor) override
-  {
-    return PNeckoParent::RecvPCookieServiceConstructor(aActor);
-  }
 
   /*
    * This implementation of nsIAuthPrompt2 is used for nested remote iframes that

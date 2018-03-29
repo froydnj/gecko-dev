@@ -418,11 +418,6 @@ public:
 
   virtual PNeckoParent* AllocPNeckoParent() override;
 
-  virtual mozilla::ipc::IPCResult RecvPNeckoConstructor(PNeckoParent* aActor) override
-  {
-    return PContentParent::RecvPNeckoConstructor(aActor);
-  }
-
   virtual PPrintingParent* AllocPPrintingParent() override;
 
   virtual bool DeallocPPrintingParent(PPrintingParent* aActor) override;
@@ -455,22 +450,11 @@ public:
 
   virtual PHalParent* AllocPHalParent() override;
 
-  virtual mozilla::ipc::IPCResult RecvPHalConstructor(PHalParent* aActor) override
-  {
-    return PContentParent::RecvPHalConstructor(aActor);
-  }
-
   virtual PHeapSnapshotTempFileHelperParent*
   AllocPHeapSnapshotTempFileHelperParent() override;
 
   virtual PJavaScriptParent*
   AllocPJavaScriptParent() override;
-
-  virtual mozilla::ipc::IPCResult
-  RecvPJavaScriptConstructor(PJavaScriptParent* aActor) override
-  {
-    return PContentParent::RecvPJavaScriptConstructor(aActor);
-  }
 
   virtual PRemoteSpellcheckEngineParent* AllocPRemoteSpellcheckEngineParent() override;
 

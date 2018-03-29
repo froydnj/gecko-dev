@@ -2521,18 +2521,6 @@ PluginInstanceChild::RecvPPluginScriptableObjectConstructor(
     return IPC_OK();
 }
 
-mozilla::ipc::IPCResult
-PluginInstanceChild::RecvPBrowserStreamConstructor(
-    PBrowserStreamChild* aActor,
-    const nsCString& url,
-    const uint32_t& length,
-    const uint32_t& lastmodified,
-    PStreamNotifyChild* notifyData,
-    const nsCString& headers)
-{
-    return IPC_OK();
-}
-
 NPError
 PluginInstanceChild::DoNPP_NewStream(BrowserStreamChild* actor,
                                      const nsCString& mimeType,

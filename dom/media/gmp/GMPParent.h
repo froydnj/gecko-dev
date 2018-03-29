@@ -163,7 +163,6 @@ private:
   PGMPStorageParent* AllocPGMPStorageParent() override;
   bool DeallocPGMPStorageParent(PGMPStorageParent* aActor) override;
 
-  mozilla::ipc::IPCResult RecvPGMPTimerConstructor(PGMPTimerParent* actor) override;
   PGMPTimerParent* AllocPGMPTimerParent() override;
   bool DeallocPGMPTimerParent(PGMPTimerParent* aActor) override;
 
