@@ -446,10 +446,6 @@ set_config('ENABLE_PIPELINE_OPERATOR', enable_pipeline_operator)
 set_define('ENABLE_PIPELINE_OPERATOR', enable_pipeline_operator)
 
 
-include('build/moz.configure/rust.configure',
-        when='--enable-compile-environment')
-
-
 # Experimental support for BinAST
 # ==============================================================
 
