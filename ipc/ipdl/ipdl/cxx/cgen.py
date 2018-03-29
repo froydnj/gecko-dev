@@ -153,6 +153,8 @@ class CxxCodeGen(CodePrinter, Visitor):
             self.printdent('struct')
         else:
             self.printdent('class')
+        if c.abstract:
+            self.write(' NS_NO_VTABLE')
         self.write(' '+ c.name)
         if c.final:
             self.write(' final')
