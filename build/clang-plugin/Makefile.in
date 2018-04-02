@@ -10,6 +10,10 @@ ifneq ($(HOST_OS_ARCH),WINNT)
 DSO_LDOPTS := -shared
 endif
 
+ifeq ($(HOST_OS_ARCH),WINNT)
+CXX := $(HOST_CXX)
+endif
+
 ifeq ($(HOST_OS_ARCH)_$(OS_ARCH),Linux_Darwin)
 # Use the host compiler instead of the target compiler.
 CXX := $(HOST_CXX)
