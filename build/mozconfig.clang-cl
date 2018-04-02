@@ -5,6 +5,8 @@ if test -d "$topsrcdir/clang/bin"; then
     mk_export_correct_style PATH
 fi
 
+export HOST_CC=clang-cl
+export HOST_CXX=clang-cl
 export CC=clang-cl
 export CXX=clang-cl
 
