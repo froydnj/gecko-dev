@@ -57,6 +57,12 @@ MOZ_TYPE_SPECIFIC_SCOPED_POINTER_TEMPLATE(ScopedPSecurityDescriptor, \
 namespace ipc {
 
 IPCResult
+IPCResult::Fail(NotNull<IProtocol*> actor, const char* where)
+{
+  return Fail(actor, where, "");
+}
+
+IPCResult
 IPCResult::Fail(NotNull<IProtocol*> actor, const char* where, const char* why)
 {
   // Calls top-level protocol to handle the error.

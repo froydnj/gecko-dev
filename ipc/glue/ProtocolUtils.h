@@ -375,7 +375,8 @@ typedef IPCMessageStart ProtocolId;
 class IPCResult {
 public:
     static IPCResult Ok() { return IPCResult(true); }
-    static IPCResult Fail(NotNull<IProtocol*> aActor, const char* aWhere, const char* aWhy = "");
+    static IPCResult Fail(NotNull<IProtocol*> aActor, const char* aWhere, const char* aWhy);
+    static IPCResult Fail(NotNull<IProtocol*> aActor, const char* aWhere);
     MOZ_IMPLICIT operator bool() const { return mSuccess; }
 private:
     explicit IPCResult(bool aResult) : mSuccess(aResult) {}
