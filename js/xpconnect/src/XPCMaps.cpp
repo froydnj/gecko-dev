@@ -20,6 +20,7 @@ using namespace mozilla;
 // Note this is returning the hash of the bit pattern of the first part of the nsID, not
 // the hash of the pointer to the nsID.
 
+#if 0
 static PLDHashNumber
 HashIIDPtrKey(const void* key)
 {
@@ -32,6 +33,7 @@ MatchIIDPtrKey(const PLDHashEntryHdr* entry, const void* key)
     return ((const nsID*)key)->
                 Equals(*((const nsID*)((PLDHashEntryStub*)entry)->key));
 }
+#endif
 
 static PLDHashNumber
 HashNativeKey(const void* data)
