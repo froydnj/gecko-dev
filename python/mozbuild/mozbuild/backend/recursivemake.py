@@ -1073,7 +1073,9 @@ class RecursiveMakeBackend(CommonBackend):
             # listing the .idls here, we ensure the make file has a
             # reference to the new .idl. Since the new .idl presumably has
             # an mtime newer than the .xpt, it will trigger xpt generation.
-            mk.add_statement('%s_deps = %s' % (module, ' '.join(deps)))
+
+            mk.add_statement('%s_deps = %s' % (module, ' '.join(d.full_path
+                                                                for d in deps)))
 
             build_files.add_optional_exists('%s.xpt' % module)
 
