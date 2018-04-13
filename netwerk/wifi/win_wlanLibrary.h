@@ -7,6 +7,7 @@
 #pragma once
 
 // Moz headers (alphabetical)
+#include "mozilla/UniquePtr.h"
 
 // System headers (alphabetical)
 #include <windows.h>   // HINSTANCE, HANDLE
@@ -15,7 +16,7 @@
 
 class WinWLANLibrary {
  public:
-  static WinWLANLibrary* Load();
+  static mozilla::UniquePtr<WinWLANLibrary> Load();
   ~WinWLANLibrary();
 
   HANDLE GetWLANHandle() const;
@@ -44,7 +45,7 @@ class WinWLANLibrary {
 
 class ScopedWLANObject {
 public:
- ScopedWLANObject(WinWLANLibrary* library, void* object)
+ ScopedWLANObject(const UniquePtr<WinWLANLibrary>& library, void* object)
    : mLibrary(library)
    , mObject(object)
   {
@@ -56,6 +57,6 @@ public:
   }
 
  private:
-  WinWLANLibrary *mLibrary;
+  const UniquePtr<WinWLANLibrary>& mLibrary;
   void *mObject;
 };

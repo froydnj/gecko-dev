@@ -11,13 +11,12 @@
 WinWLANLibrary*
 WinWLANLibrary::Load()
 {
-  WinWLANLibrary *ret = new WinWLANLibrary();
+  UniquePtr<WinWLANLibrary> ret(new WinWLANLibrary());
   if (!ret) {
     return nullptr;
   }
 
   if (!ret->Initialize()) {
-    delete ret;
     return nullptr;
   }
 

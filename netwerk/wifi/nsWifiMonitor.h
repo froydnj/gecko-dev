@@ -7,7 +7,6 @@
 
 #include "nsIWifiMonitor.h"
 #include "nsCOMPtr.h"
-#include "nsAutoPtr.h"
 #include "nsProxyRelease.h"
 #include "nsIThread.h"
 #include "nsIRunnable.h"
@@ -16,6 +15,7 @@
 #include "mozilla/Atomics.h"
 #include "mozilla/ReentrantMonitor.h"
 #include "mozilla/Logging.h"
+#include "mozilla/UniquePtr.h"
 #include "nsIObserver.h"
 #include "nsTArray.h"
 #include "nsITimer.h"
@@ -75,7 +75,7 @@ class nsWifiMonitor final : nsIRunnable, nsIWifiMonitor, nsIObserver
   mozilla::ReentrantMonitor mReentrantMonitor;
 
 #ifdef XP_WIN
-  nsAutoPtr<WinWifiScanner> mWinWifiScanner;
+  mozilla::UniquePtr<WinWifiScanner> mWinWifiScanner;
 #endif
 };
 

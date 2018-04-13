@@ -126,15 +126,15 @@ class nsPassErrorToWifiListeners final : public nsIRunnable
   NS_DECL_THREADSAFE_ISUPPORTS
   NS_DECL_NSIRUNNABLE
 
-  nsPassErrorToWifiListeners(nsAutoPtr<WifiListenerArray> aListeners,
+  nsPassErrorToWifiListeners(UniquePtr<WifiListenerArray> aListeners,
                              nsresult aResult)
-  : mListeners(aListeners),
+  : mListeners(Move(aListeners)),
     mResult(aResult)
   {}
 
  private:
   ~nsPassErrorToWifiListeners() = default;
-  nsAutoPtr<WifiListenerArray> mListeners;
+  UniquePtr<WifiListenerArray> mListeners;
   nsresult mResult;
 };
 
@@ -157,14 +157,14 @@ NS_IMETHODIMP nsWifiMonitor::Run()
   nsresult rv = DoScan();
   LOG(("@@@@@ wifi monitor run::doscan complete %" PRIx32 "\n", static_cast<uint32_t>(rv)));
 
-  nsAutoPtr<WifiListenerArray> currentListeners;
+  UniquePtr<WifiListenerArray> currentListeners;
   bool doError = false;
 
   {
       ReentrantMonitorAutoEnter mon(mReentrantMonitor);
       if (mKeepGoing && NS_FAILED(rv)) {
           doError = true;
-          currentListeners = new WifiListenerArray(mListeners.Length());
+          currentListeners = MakeUnique<WifiListenerArray>(mListeners.Length());
           for (uint32_t i = 0; i < mListeners.Length(); i++)
               currentListeners->AppendElement(mListeners[i].mListener);
       }
@@ -176,7 +176,7 @@ NS_IMETHODIMP nsWifiMonitor::Run()
     if (!target)
       return NS_ERROR_UNEXPECTED;
 
-    nsCOMPtr<nsIRunnable> runnable(new nsPassErrorToWifiListeners(currentListeners, rv));
+    nsCOMPtr<nsIRunnable> runnable(new nsPassErrorToWifiListeners(Move(currentListeners), rv));
     if (!runnable)
       return NS_ERROR_OUT_OF_MEMORY;
 
@@ -193,16 +193,16 @@ class nsCallWifiListeners final : public nsIRunnable
   NS_DECL_THREADSAFE_ISUPPORTS
   NS_DECL_NSIRUNNABLE
 
-  nsCallWifiListeners(nsAutoPtr<WifiListenerArray> aListeners,
-                      nsAutoPtr<nsTArray<nsIWifiAccessPoint*> > aAccessPoints)
-  : mListeners(aListeners),
-    mAccessPoints(aAccessPoints)
+  nsCallWifiListeners(UniquePtr<WifiListenerArray> aListeners,
+                      UniquePtr<nsTArray<nsIWifiAccessPoint*>> aAccessPoints)
+  : mListeners(Move(aListeners)),
+    mAccessPoints(Move(aAccessPoints))
   {}
 
  private:
   ~nsCallWifiListeners() = default;
-  nsAutoPtr<WifiListenerArray> mListeners;
-  nsAutoPtr<nsTArray<nsIWifiAccessPoint*> > mAccessPoints;
+  UniquePtr<WifiListenerArray> mListeners;
+  UniquePtr<nsTArray<nsIWifiAccessPoint*>> mAccessPoints;
 };
 
 NS_IMPL_ISUPPORTS(nsCallWifiListeners,
@@ -221,11 +221,11 @@ nsresult
 nsWifiMonitor::CallWifiListeners(const nsCOMArray<nsWifiAccessPoint> &aAccessPoints,
                                  bool aAccessPointsChanged)
 {
-    nsAutoPtr<WifiListenerArray> currentListeners;
+    UniquePtr<WifiListenerArray> currentListeners;
     {
       ReentrantMonitorAutoEnter mon(mReentrantMonitor);
 
-      currentListeners = new WifiListenerArray(mListeners.Length());
+      currentListeners = MakeUnique<WifiListenerArray>(mListeners.Length());
 
       for (uint32_t i = 0; i < mListeners.Length(); i++) {
         if (!mListeners[i].mHasSentData || aAccessPointsChanged) {
@@ -238,8 +238,7 @@ nsWifiMonitor::CallWifiListeners(const nsCOMArray<nsWifiAccessPoint> &aAccessPoi
     if (currentListeners->Length() > 0)
     {
       uint32_t resultCount = aAccessPoints.Count();
-      nsAutoPtr<nsTArray<nsIWifiAccessPoint*> > accessPoints(
-                               new nsTArray<nsIWifiAccessPoint *>(resultCount));
+      auto accessPoints = MakeUnique<nsTArray<nsIWifiAccessPoint *>>(resultCount);
       if (!accessPoints)
         return NS_ERROR_OUT_OF_MEMORY;
 
@@ -251,7 +250,7 @@ nsWifiMonitor::CallWifiListeners(const nsCOMArray<nsWifiAccessPoint> &aAccessPoi
         return NS_ERROR_UNEXPECTED;
 
       nsCOMPtr<nsIRunnable> runnable(
-                      new nsCallWifiListeners(currentListeners, accessPoints));
+                      new nsCallWifiListeners(Move(currentListeners), Move(accessPoints)));
       if (!runnable)
         return NS_ERROR_OUT_OF_MEMORY;
 

@@ -29,7 +29,7 @@ nsresult
 nsWifiMonitor::DoScan()
 {
     if (!mWinWifiScanner) {
-      mWinWifiScanner = new WinWifiScanner();
+      mWinWifiScanner = MakeUnique<WinWifiScanner>();
       if (!mWinWifiScanner) {
         // TODO: Probably return OOM error
         return NS_ERROR_FAILURE;
