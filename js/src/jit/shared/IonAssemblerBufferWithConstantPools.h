@@ -831,51 +831,7 @@ struct AssemblerBufferWithConstantPools : public AssemblerBuffer<SliceSize, Inst
 
     MOZ_NEVER_INLINE
     BufferOffset allocEntry(size_t numInst, unsigned numPoolEntries,
-                            uint8_t* inst, uint8_t* data, PoolEntry* pe = nullptr)
-    {
-        // The allocation of pool entries is not supported in a no-pool region,
-        // check.
-        MOZ_ASSERT_IF(numPoolEntries, !canNotPlacePool_);
-
-        if (this->oom() && !this->bail())
-            return BufferOffset();
-
-        insertNopFill();
-
-#ifdef JS_JITSPEW
-        if (numPoolEntries && JitSpewEnabled(JitSpew_Pools)) {
-            JitSpew(JitSpew_Pools, "[%d] Inserting %d entries into pool", id, numPoolEntries);
-            JitSpewStart(JitSpew_Pools, "[%d] data is: 0x", id);
-            size_t length = numPoolEntries * sizeof(PoolAllocUnit);
-            for (unsigned idx = 0; idx < length; idx++) {
-                JitSpewCont(JitSpew_Pools, "%02x", data[length - idx - 1]);
-                if (((idx & 3) == 3) && (idx + 1 != length))
-                    JitSpewCont(JitSpew_Pools, "_");
-            }
-            JitSpewFin(JitSpew_Pools);
-        }
-#endif
-
-        // Insert the pool value.
-        unsigned index = insertEntryForwards(numInst, numPoolEntries, inst, data);
-        if (this->oom())
-            return BufferOffset();
-
-        // Now to get an instruction to write.
-        PoolEntry retPE;
-        if (numPoolEntries) {
-            JitSpew(JitSpew_Pools, "[%d] Entry has index %u, offset %zu", id, index,
-                    sizeExcludingCurrentPool());
-            Asm::InsertIndexIntoTag(inst, index);
-            // Figure out the offset within the pool entries.
-            retPE = PoolEntry(poolEntryCount);
-            poolEntryCount += numPoolEntries;
-        }
-        // Now inst is a valid thing to insert into the instruction stream.
-        if (pe != nullptr)
-            *pe = retPE;
-        return this->putBytes(numInst * InstSize, inst);
-    }
+                            uint8_t* inst, uint8_t* data, PoolEntry* pe = nullptr);
 
 
     // putInt is the workhorse for the assembler and higher-level buffer
@@ -1175,6 +1131,56 @@ struct AssemblerBufferWithConstantPools : public AssemblerBuffer<SliceSize, Inst
         return i->offset.getOffset() + relativeIndex * sizeof(PoolAllocUnit);
     }
 };
+
+template <size_t S, size_t InstSize, class I, class Asm, unsigned N>
+MOZ_NEVER_INLINE
+BufferOffset 
+AssemblerBufferWithConstantPools<S, InstSize, I, Asm, N>::allocEntry(size_t numInst, unsigned numPoolEntries,
+                                                                     uint8_t* inst, uint8_t* data, PoolEntry* pe)
+{
+    // The allocation of pool entries is not supported in a no-pool region,
+    // check.
+    MOZ_ASSERT_IF(numPoolEntries, !canNotPlacePool_);
+
+    if (this->oom() && !this->bail())
+        return BufferOffset();
+
+    insertNopFill();
+
+#ifdef JS_JITSPEW
+    if (numPoolEntries && JitSpewEnabled(JitSpew_Pools)) {
+        JitSpew(JitSpew_Pools, "[%d] Inserting %d entries into pool", id, numPoolEntries);
+        JitSpewStart(JitSpew_Pools, "[%d] data is: 0x", id);
+        size_t length = numPoolEntries * sizeof(PoolAllocUnit);
+        for (unsigned idx = 0; idx < length; idx++) {
+            JitSpewCont(JitSpew_Pools, "%02x", data[length - idx - 1]);
+            if (((idx & 3) == 3) && (idx + 1 != length))
+                JitSpewCont(JitSpew_Pools, "_");
+        }
+        JitSpewFin(JitSpew_Pools);
+    }
+#endif
+
+    // Insert the pool value.
+    unsigned index = insertEntryForwards(numInst, numPoolEntries, inst, data);
+    if (this->oom())
+        return BufferOffset();
+
+    // Now to get an instruction to write.
+    PoolEntry retPE;
+    if (numPoolEntries) {
+        JitSpew(JitSpew_Pools, "[%d] Entry has index %u, offset %zu", id, index,
+                sizeExcludingCurrentPool());
+        Asm::InsertIndexIntoTag(inst, index);
+        // Figure out the offset within the pool entries.
+        retPE = PoolEntry(poolEntryCount);
+        poolEntryCount += numPoolEntries;
+    }
+    // Now inst is a valid thing to insert into the instruction stream.
+    if (pe != nullptr)
+        *pe = retPE;
+    return this->putBytes(numInst * InstSize, inst);
+}
 
 } // namespace ion
 } // namespace js
