@@ -722,6 +722,12 @@ InitLog(const EnvCharType* aEnvVar, const char* aMsg, FILE** aResult)
         fprintf(stderr, "### " ENVVAR_PRINTF " defined -- logging %s to " ENVVAR_PRINTF "\n",
                 envvar, aMsg, fp);
       } else {
+#ifdef XP_WIN
+        NS_ConvertUTF16toUTF8 utf8Value(fname);
+        for (uint32_t i = 0, length = utf8Value.Length(); i < length; ++i) {
+          fprintf(stderr, "## utf8[%u] = %d\n", i, (int)utf8Value[i]);
+        }
+#endif
         fprintf(stderr, "### " ENVVAR_PRINTF " defined -- unable to log %s to " ENVVAR_PRINTF "\n",
                 envvar, aMsg, fp);
         MOZ_ASSERT(false, "Tried and failed to create an XPCOM log");
