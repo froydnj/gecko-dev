@@ -758,6 +758,8 @@ falling back to not using job objects for managing child processes""", file=sys.
         args.update(self.keywordargs)
 
         # launch the process
+        command = ' '.join([self.cmd] + self.args)
+        print("Running command: {}".format(command.encode("utf-8")))
         self.proc = self.Process([self.cmd] + self.args, **args)
 
         if isPosix:

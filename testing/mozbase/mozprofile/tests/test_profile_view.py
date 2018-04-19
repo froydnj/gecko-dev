@@ -6,10 +6,11 @@
 
 from __future__ import absolute_import
 
-import mozprofile
 import os
 
+import mozprofile
 import mozunit
+import pytest
 
 here = os.path.dirname(os.path.abspath(__file__))
 
@@ -46,6 +47,7 @@ def test_unicode_cast():
     assert unicode(profile) == profile.summary()
 
 
+@pytest.mark.skip("Bug 1453945")
 def test_profile_diff():
     profile1 = mozprofile.Profile()
     profile2 = mozprofile.Profile(preferences=dict(foo='bar'))

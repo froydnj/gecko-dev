@@ -1,3 +1,5 @@
+# coding=UTF-8
+
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -64,7 +66,7 @@ class BaseProfile(object):
             # Ensure we have a full path to the profile
             self.profile = os.path.abspath(os.path.expanduser(profile))
         else:
-            self.profile = tempfile.mkdtemp(suffix='.mozrunner')
+            self.profile = tempfile.mkdtemp(suffix=u'.mozrunner🍪')
 
     def __enter__(self):
         return self
