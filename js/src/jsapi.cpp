@@ -2006,6 +2006,7 @@ JS_NewObjectWithGivenProto(JSContext* cx, const JSClass* jsclasp, HandleObject p
     return NewObjectWithGivenProto(cx, clasp, proto);
 }
 
+MOZ_NEVER_INLINE
 JS_PUBLIC_API(JSObject*)
 JS_NewPlainObject(JSContext* cx)
 {
@@ -3386,6 +3387,7 @@ JS_NewArrayObject(JSContext* cx, const JS::HandleValueArray& contents)
     return NewDenseCopiedArray(cx, contents.length(), contents.begin());
 }
 
+MOZ_NEVER_INLINE
 JS_PUBLIC_API(JSObject*)
 JS_NewArrayObject(JSContext* cx, size_t length)
 {
