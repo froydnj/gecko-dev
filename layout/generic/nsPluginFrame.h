@@ -242,9 +242,6 @@ protected:
                       const ReflowInput& aReflowInput,
                       ReflowOutput& aDesiredSize);
 
-  bool IsFocusable(int32_t *aTabIndex = nullptr,
-                   bool aWithMouse = false) override;
-
   // check attributes and optionally CSS to see if we should display anything
   bool IsHidden(bool aCheckVisibilityStyle = true) const;
 

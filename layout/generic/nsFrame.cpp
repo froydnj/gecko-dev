@@ -10003,7 +10003,7 @@ nsFrame::GetFirstLeaf(nsPresContext* aPresContext, nsIFrame **aFrame)
   }
 }
 
-/* virtual */ bool
+bool
 nsIFrame::IsFocusable(int32_t *aTabIndex, bool aWithMouse)
 {
   int32_t tabIndex = -1;
