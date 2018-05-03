@@ -3275,7 +3275,7 @@ public:
    *  @param aSelCon will contain the selection controller associated with
    *  the frame.
    */
-  virtual nsresult  GetSelectionController(nsPresContext *aPresContext, nsISelectionController **aSelCon) = 0;
+  nsresult GetSelectionController(nsPresContext *aPresContext, nsISelectionController **aSelCon);
 
   /**
    *  Call to get nsFrameSelection for this frame.

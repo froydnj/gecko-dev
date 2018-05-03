@@ -7952,7 +7952,7 @@ nsFrame::IsSelfEmpty()
 }
 
 nsresult
-nsFrame::GetSelectionController(nsPresContext *aPresContext, nsISelectionController **aSelCon)
+nsIFrame::GetSelectionController(nsPresContext *aPresContext, nsISelectionController **aSelCon)
 {
   if (!aPresContext || !aSelCon)
     return NS_ERROR_INVALID_ARG;

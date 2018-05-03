@@ -211,9 +211,6 @@ public:
   nsIFrame* GetNextInFlowVirtual() const override;
   void SetNextInFlow(nsIFrame*) override;
 
-  nsresult GetSelectionController(nsPresContext *aPresContext,
-                                  nsISelectionController **aSelCon) override;
-
   FrameSearchResult PeekOffsetNoAmount(bool aForward,
                                        int32_t* aOffset) override;
   FrameSearchResult
