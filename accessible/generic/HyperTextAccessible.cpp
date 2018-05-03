@@ -1208,7 +1208,7 @@ HyperTextAccessible::OffsetAtPoint(int32_t aX, int32_t aY, uint32_t aCoordType)
         // Finished
         if (frame->IsTextFrame()) {
           nsIFrame::ContentOffsets contentOffsets =
-            frame->GetContentOffsetsFromPointExternal(pointInFrame, nsIFrame::IGNORE_SELECTION_STYLE);
+            frame->GetContentOffsetsFromPoint(pointInFrame, nsIFrame::IGNORE_SELECTION_STYLE);
           if (contentOffsets.IsNull() || contentOffsets.content != content) {
             return -1; // Not found
           }

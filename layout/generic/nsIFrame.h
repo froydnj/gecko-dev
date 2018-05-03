@@ -1945,10 +1945,6 @@ public:
   ContentOffsets GetContentOffsetsFromPoint(const nsPoint& aPoint,
                                             uint32_t aFlags = 0);
 
-  virtual ContentOffsets GetContentOffsetsFromPointExternal(const nsPoint& aPoint,
-                                                            uint32_t aFlags = 0)
-  { return GetContentOffsetsFromPoint(aPoint, aFlags); }
-
   /**
    * Ensure that aImage gets notifed when the underlying image request loads
    * or animates.
