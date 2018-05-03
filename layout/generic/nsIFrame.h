@@ -1292,7 +1292,7 @@ public:
    * having their original values.
    */
   virtual nsMargin GetUsedMargin() const;
-  virtual mozilla::LogicalMargin
+  mozilla::LogicalMargin
   GetLogicalUsedMargin(mozilla::WritingMode aWritingMode) const {
     return mozilla::LogicalMargin(aWritingMode, GetUsedMargin());
   }
@@ -1309,7 +1309,7 @@ public:
    * elements.
    */
   virtual nsMargin GetUsedBorder() const;
-  virtual mozilla::LogicalMargin
+  mozilla::LogicalMargin
   GetLogicalUsedBorder(mozilla::WritingMode aWritingMode) const {
     return mozilla::LogicalMargin(aWritingMode, GetUsedBorder());
   }
@@ -1320,7 +1320,7 @@ public:
    * as of the most recent reflow.
    */
   virtual nsMargin GetUsedPadding() const;
-  virtual mozilla::LogicalMargin
+  mozilla::LogicalMargin
   GetLogicalUsedPadding(mozilla::WritingMode aWritingMode) const {
     return mozilla::LogicalMargin(aWritingMode, GetUsedPadding());
   }
