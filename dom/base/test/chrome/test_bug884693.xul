@@ -34,6 +34,9 @@ https://bugzilla.mozilla.org/show_bug.cgi?id=884693
           is(xhr.responseText, expectedResponse, "Correct responseText returned");
 
           let messages = consoleService.getMessageArray() || [];
+	  if (messages.length != expectedMessages.length) {
+	      messages.map(m => info("Have message: " + m.message));
+	  }
           is(messages.length, expectedMessages.length, "Got expected message count");
           messages = messages.map(m => m.message).join(",");
           for(let message of expectedMessages) {
