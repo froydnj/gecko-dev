@@ -36,29 +36,6 @@ esac
 
 ])
 
-AC_DEFUN([MOZ_ANDROID_CPU_ARCH],
-[
-
-if test "$OS_TARGET" = "Android"; then
-    case "${CPU_ARCH}" in
-    arm)
-        ANDROID_CPU_ARCH=armeabi-v7a
-        ;;
-    x86)
-        ANDROID_CPU_ARCH=x86
-        ;;
-    mips32) # When target_cpu is mipsel, CPU_ARCH is mips32
-        ANDROID_CPU_ARCH=mips
-        ;;
-    aarch64)
-        ANDROID_CPU_ARCH=arm64-v8a
-        ;;
-    esac
-
-    AC_SUBST(ANDROID_CPU_ARCH)
-fi
-])
-
 AC_DEFUN([MOZ_ANDROID_STLPORT],
 [
 

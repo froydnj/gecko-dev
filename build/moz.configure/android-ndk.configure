@@ -16,6 +16,24 @@ option('--with-android-googlevr-sdk', nargs=1,
 
 
 @depends(target)
+def android_cpu_arch(target):
+    if target.os != "Android":
+        return
+
+    if target.cpu == 'arm':
+        return 'armeabi-v7a'
+    if target.cpu == 'x86':
+        return 'x86'
+    if target.cpu == 'mips32':
+        return 'mips'
+    if target.cpu == 'aarch64':
+        return 'arm64-v8a'
+
+    die('Unknown Android CPU: %s', target.cpu)
+
+set_config('ANDROID_CPU_ARCH', android_cpu_arch)
+    
+@depends(target)
 def min_android_version(target):
     if target.cpu in ['aarch64', 'x86_64', 'mips64']:
         # 64-bit support was added in API 21.
