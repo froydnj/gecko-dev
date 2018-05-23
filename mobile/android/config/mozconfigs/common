@@ -28,6 +28,10 @@ if [ -z "$NO_NDK" ]; then
     CC="$topsrcdir/clang/bin/clang"
     CXX="$topsrcdir/clang/bin/clang++"
     ac_add_options --with-android-ndk="$topsrcdir/android-ndk"
+
+    # Enable static analysis with our own clang.
+    ac_add_options --enable-clang-plugin
+    export LLVMCONFIG="$topsrcdir/clang/bin/llvm-config"
 fi
 
 ac_add_options --enable-update-channel=${MOZ_UPDATE_CHANNEL}
