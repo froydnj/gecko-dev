@@ -5,6 +5,7 @@
 #include <ostream>
 #include <istream>
 #include <string>
+#include <dlfcn.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <mozilla/Assertions.h>
@@ -125,10 +126,46 @@ namespace std {
    * We're creating an entry point for the new and intermediate ABIs, and make
    * them call the old ABI. */
 
+  /* But there's a problem: the intermediate ABI is what libstdc++ >= 5 uses
+   * to start the underlying thread.  The old ABI on such libstdc++ just calls
+   * the intermediate ABI.  So if we naively override the intermediate ABI to
+   * call the old ABI, this works fine on libstdc++ < 5, but results in
+   * infinite recursion on libstdc++ >= 5.
+   *
+   * To work through this, we're going to see if the symbol we're overriding
+   * exists in other shared objects.  If it does, then it's the symbol we need
+   * to call in libstdc++ >= 5, and we're going to call it.  Otherwise, we know
+   * that we can simply use the old ABI, because we're not going to hit
+   * weird cases.  */
+
   __attribute__((weak))
-  void thread::_M_start_thread(shared_ptr<_Impl_base> impl, void (*)())
+  void thread::_M_start_thread(shared_ptr<_Impl_base> impl, void (*f)())
   {
-    _M_start_thread(std::move(impl));
+    // Use thread-safe static initialization to do our symbol lookup.
+    static struct StartThreadWrapper {
+      StartThreadWrapper() {
+        // NULL return on error is handled below.
+        mFuncPtr = dlsym(RTLD_NEXT,
+                         "_ZNSt6thread15_M_start_threadESt10shared_ptrINS_10_Impl_baseEEPFvvE");
+      }
+
+      void* mFuncPtr;
+    } wrapper;
+
+    // Couldn't find the libstdc++5 symbol, use the libstdc++4 API.
+    if (!wrapper.mFuncPtr) {
+      _M_start_thread(std::move(impl));
+      return;
+    }
+
+    // The libstdc++5 symbol that we overrode is actually the symbol that
+    // starts the thread.  So we need to call it directly through the
+    // function pointer.  See dlsym man page for justification for the
+    // casting shenanigans.
+    void (*ptr)(void*, shared_ptr<_Impl_base>, void (*)());
+    *(void**)(&ptr) = wrapper.mFuncPtr;
+
+    (*ptr)(this, std::move(impl), f);
   }
 
 #if MOZ_LIBSTDCXX_VERSION >= GLIBCXX_VERSION(3, 4, 22)
