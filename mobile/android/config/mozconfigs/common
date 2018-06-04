@@ -95,7 +95,4 @@ fi
 # Package js shell.
 export MOZ_PACKAGE_JSSHELL=1
 
-. "$topsrcdir/build/unix/mozconfig.stdcxx"
-unset MOZ_STDCXX_COMPAT
-
 JS_BINARY="$topsrcdir/mobile/android/config/js_wrapper.sh"
