@@ -347,7 +347,7 @@ endif
 # verification when cross-compiling.
 ifndef JS_BINARY
   ifndef CROSS_COMPILE
-    JS_BINARY = $(wildcard $(DIST)/bin/js)
+    JS_BINARY = $(wildcard $(DIST)/bin/js$(BIN_SUFFIX))
   endif
 endif
 
