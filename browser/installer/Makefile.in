@@ -105,8 +105,15 @@ MOZ_PKG_MAC_ICON=$(topsrcdir)/$(MOZ_BRANDING_DIRECTORY)/disk.icns
 MOZ_PKG_MAC_EXTRA=--symlink '/Applications:/ '
 endif
 
+MOZ_PACKAGER_MINIFY=1
+
 include $(topsrcdir)/toolkit/mozapps/installer/signing.mk
 include $(topsrcdir)/toolkit/mozapps/installer/packager.mk
+
+# Don't minify JS yet, due to concerns about debuggability.
+# Also, the JS minification setup really only works correctly on Android:
+# we need extra setup to use the newly-built shell for Linux and Windows,
+# and Mac requires some extra care due to cross-compilation.
 
 ifeq (bundle, $(MOZ_FS_LAYOUT))
 BINPATH = $(_BINPATH)
